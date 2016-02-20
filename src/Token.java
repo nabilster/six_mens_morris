@@ -3,22 +3,13 @@
     //anything we need from it to the node class
 //TODO Impliment node
 public class Token {
-    //private BoardNode node;
     int colour;
 
     public Token (int colour/*, BoardNode node*/){
         this.colour=colour;
-        //this.node=node;
     }
 
-    /*
-    public Token(int colour){
-        this.colour=colour;
+    public int getColour(){
+        return colour;
     }
-    */
-
-    //TODO change coordinates to node's
-    public int getX(){return 173;}
-    public int getY(){return 46;}
-    public int getColour(){return colour;}
 }

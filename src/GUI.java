@@ -19,9 +19,12 @@ public class GUI extends JFrame implements ActionListener,MouseListener{
     private JPanel header = new JPanel(), left=new JPanel(),right=new JPanel(); //Panels
     private Player [] players = new Player[2];              //player model
     private PlayerView [] playerViews=new PlayerView[2];    //player view
+    private Node [] nodes = new Node [16];
 
 
     public GUI (){
+        initializeNodes();
+
         //initializes stuff, adds listeners, sets first player
         header.setLayout(new FlowLayout());
         JButton newGame = new JButton("New Game");
@@ -52,6 +55,29 @@ public class GUI extends JFrame implements ActionListener,MouseListener{
         getContentPane().add(left,BorderLayout.WEST);
         getContentPane().add(right,BorderLayout.EAST);
         getContentPane().add(footer,BorderLayout.SOUTH);
+    }
+
+    private void initializeNodes(){
+        nodes[0]=new Node(0.088,0.093);
+        nodes[1]=new Node(0.498,0.093);
+        nodes[2]=new Node(0.908,0.093);
+
+        nodes[3]=new Node(0.293,0.298);
+        nodes[4]=new Node(0.498,0.298);
+        nodes[5]=new Node(0.703,0.298);
+
+        nodes[6]=new Node(0.088,0.503);
+        nodes[7]=new Node(0.293,0.503);
+        nodes[8]=new Node(0.703,0.503);
+        nodes[9]=new Node(0.908,0.503);
+
+        nodes[10]=new Node(0.293,0.708);
+        nodes[11]=new Node(0.498,0.708);
+        nodes[12]=new Node(0.703,0.708);
+
+        nodes[13]=new Node(0.088,0.913);
+        nodes[14]=new Node(0.498,0.913);
+        nodes[15]=new Node(0.908,0.913);
     }
 
     //sets up side panels
@@ -134,18 +160,21 @@ public class GUI extends JFrame implements ActionListener,MouseListener{
     public void mouseReleased(MouseEvent e) {
         int x=e.getX();
         int y=e.getY();
-        if (e.getButton()==1&&!gameState.equals("")){           //if the correct mouse button is pressed and pieces are
+        int nodeNumber = findNodeNumber(x,y);
+        if (e.getButton()==1&&!gameState.equals("")&&nodeNumber!=-1){           //if the correct mouse button is pressed and pieces are
                                                                     //being placed
             //TODO send coordinates to model to check for node and such
             if (turnNumber%2==0){                   //if "red" player's turn
                 if (players[0].removeToken()){
-                    board.placeToken(new Token(colour1Code));
+                    nodes[nodeNumber].addToken(colour1Code);
+                    board.placeToken(nodes[nodeNumber]);
                     playerViews[0].removeToken();
                     //System.out.print("\tplaced red\t");
                 }
             }else{                                  //if "blue" player's turn
                 if (players[1].removeToken()){
-                    board.placeToken(new Token(colour2Code));
+                    nodes[nodeNumber].addToken(colour2Code);
+                    board.placeToken(nodes[nodeNumber]);
                     playerViews[1].removeToken();
                     //System.out.print("\tplaced blue\t");
                 }
@@ -157,7 +186,16 @@ public class GUI extends JFrame implements ActionListener,MouseListener{
             turnIndicator.revalidate();
             revalidate();
         }
-        //System.out.println("Board Width: "+board.getWidth()+" x: "+x+"\tBoard Height: "+board.getHeight()+" y: "+y);
+        System.out.println("Board Width: "+board.getWidth()+" x: "+x+"\tBoard Height: "+board.getHeight()+" y: "+y);
+    }
+
+    private int findNodeNumber (int x, int y){
+        int nodeNumber=-1;
+        for (int i = 0; i<nodes.length;i++){
+            if (nodes[i].inRange(((double)x)/board.getWidth(),((double)y/board.getHeight())))nodeNumber=i;
+        }
+        System.out.print("Node Number: "+nodeNumber+"\t");
+        return nodeNumber;
     }
 
     public static void main (String [] args){
