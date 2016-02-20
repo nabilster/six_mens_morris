@@ -30,6 +30,7 @@ public class Node {
     }
 
     public boolean inRange (double x, double y){
+        if (x<1) return ((relX-0.05)<x&&x<(relX+0.05))&&((relY-0.05)<y&&y<(relY+0.05));
         return ((relX-0.05)<x&&x<(relX+0.05))&&((relY-0.05)<y&&y<(relY+0.05));
     }
 

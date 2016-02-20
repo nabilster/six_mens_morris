@@ -22,13 +22,16 @@ public class BoardView extends JPanel {
     @Override
     protected void paintComponent(Graphics g) { //draws board and tokens
         super.paintComponent(g);
-        int dimension=(getWidth()<getHeight())?getWidth():getHeight();
-        g.drawImage(image, getWidth() / 2 - dimension / 2, 0, dimension, dimension, null); // see javadoc for more info on the parameters
+        g.drawImage(image, getWidth() / 2 - getDimension() / 2, 0, getDimension(), getDimension(), null); // see javadoc for more info on the parameters
         for (double[] t:tokens) {
             g.setColor(new Color((int)t[0]));
-            g.fillOval((int)(t[1]*getWidth())-dimension/20,(int)(t[2]*getHeight())-dimension/20,dimension/10,dimension/10);
+            g.fillOval((int)(t[1]*getDimension()+getWidth()/2.0)-getDimension()/20,(int)(t[2]*getDimension())-getDimension()/20,getDimension()/10,getDimension()/10);
         }
 
+    }
+
+    public int getDimension (){
+        return Math.min(getHeight(),getWidth());
     }
 
 

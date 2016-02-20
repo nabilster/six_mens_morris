@@ -57,27 +57,29 @@ public class GUI extends JFrame implements ActionListener,MouseListener{
         getContentPane().add(footer,BorderLayout.SOUTH);
     }
 
+    //these are now relative to the center of the board panel due to the fact that the board image is centered with the
+        //panel, this is the easier way for tracking,  although is does cause some more complicated math
     private void initializeNodes(){
-        nodes[0]=new Node(0.088,0.093);
-        nodes[1]=new Node(0.498,0.093);
-        nodes[2]=new Node(0.908,0.093);
+        nodes[0]=new Node(-0.412,0.093);
+        nodes[1]=new Node(-0.002,0.093);
+        nodes[2]=new Node(0.408,0.093);
 
-        nodes[3]=new Node(0.293,0.298);
-        nodes[4]=new Node(0.498,0.298);
-        nodes[5]=new Node(0.703,0.298);
+        nodes[3]=new Node(-0.207,0.298);
+        nodes[4]=new Node(-0.002,0.298);
+        nodes[5]=new Node(0.203,0.298);
 
-        nodes[6]=new Node(0.088,0.503);
-        nodes[7]=new Node(0.293,0.503);
-        nodes[8]=new Node(0.703,0.503);
-        nodes[9]=new Node(0.908,0.503);
+        nodes[6]=new Node(-0.412,0.503);
+        nodes[7]=new Node(-0.207,0.503);
+        nodes[8]=new Node(0.203,0.503);
+        nodes[9]=new Node(0.408,0.503);
 
-        nodes[10]=new Node(0.293,0.708);
-        nodes[11]=new Node(0.498,0.708);
-        nodes[12]=new Node(0.703,0.708);
+        nodes[10]=new Node(-0.207,0.708);
+        nodes[11]=new Node(-0.002,0.708);
+        nodes[12]=new Node(0.203,0.708);
 
-        nodes[13]=new Node(0.088,0.913);
-        nodes[14]=new Node(0.498,0.913);
-        nodes[15]=new Node(0.908,0.913);
+        nodes[13]=new Node(-0.412,0.913);
+        nodes[14]=new Node(-0.002,0.913);
+        nodes[15]=new Node(0.408,0.913);
     }
 
     //sets up side panels
@@ -191,8 +193,9 @@ public class GUI extends JFrame implements ActionListener,MouseListener{
 
     private int findNodeNumber (int x, int y){
         int nodeNumber=-1;
+        double relX = (x-(board.getWidth()/2.0))/board.getDimension();
         for (int i = 0; i<nodes.length;i++){
-            if (nodes[i].inRange(((double)x)/board.getWidth(),((double)y/board.getHeight())))nodeNumber=i;
+            if (nodes[i].inRange(relX,((double)y/board.getDimension())))nodeNumber=i;
         }
         System.out.print("Node Number: "+nodeNumber+"\t");
         return nodeNumber;
