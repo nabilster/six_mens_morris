@@ -3,7 +3,7 @@
 public class Token {
     int colour;
     
-    public Token (int colour/*, BoardNode node*/){
+    public Token (int colour){
         this.colour=colour;
     }
     
