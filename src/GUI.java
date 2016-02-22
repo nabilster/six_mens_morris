@@ -87,7 +87,7 @@ public class GUI extends JFrame implements ActionListener,MouseListener{
     private void initSidePanels(){
         if (gameState.equals("New")){ //if new game, sets up labels
             
-            JButton check= new JButton("Check");   // add check button to run check on gamestate
+            JButton check= new JButton("Check Board Setup");   // add check button to run check on gamestate
             check.setActionCommand("check");
             check.setAlignmentX(Component.CENTER_ALIGNMENT);
             check.addActionListener(this);
@@ -102,7 +102,7 @@ public class GUI extends JFrame implements ActionListener,MouseListener{
             right.add(player2Lable);
         }else if (gameState.equals("Old")) { //if placing tokens, sets up buttons
             
-            JButton player1Button = new JButton(colour1), player2Button = new JButton(colour2), check= new JButton("Check");;
+            JButton player1Button = new JButton(colour1), player2Button = new JButton(colour2), check= new JButton("Check/Begin Game");;
             player1Button.setActionCommand("player1");
             player2Button.setActionCommand("player2");
             check.setActionCommand("check");
@@ -194,24 +194,19 @@ public class GUI extends JFrame implements ActionListener,MouseListener{
         if (e.getButton()==1&&!gameState.equals("")&&nodeNumber!=-1){           //if the correct mouse button is pressed and pieces are
             //being placed
             
-            
             if (turnNumber%2==0){                   //if "red" player's turn
                 
                 if (players[0].removeToken()){
                     nodes[nodeNumber].addToken(colour1Code);
-                    
                     board.placeToken(nodes[nodeNumber]);
                     playerViews[0].removeToken();
-                    
                 }
             }else {                                  //if "blue" player's turn
                 
                 if (players[1].removeToken()){
                     nodes[nodeNumber].addToken(colour2Code);
-                    
                     board.placeToken(nodes[nodeNumber]);
                     playerViews[1].removeToken();
-                    
                 }
             }
             if (!gameState.equals("Old"))turnNumber++; //if the next player goes
@@ -221,7 +216,7 @@ public class GUI extends JFrame implements ActionListener,MouseListener{
             turnIndicator.revalidate();
             revalidate();
         }
-        //System.out.println("Board Width: "+board.getWidth()+" x: "+x+"\tBoard Height: "+board.getHeight()+" y: "+y);
+        System.out.println("Board Width: "+board.getWidth()+" x: "+x+"\tBoard Height: "+board.getHeight()+" y: "+y);
     }
     
     private int findNodeNumber (int x, int y){
@@ -230,7 +225,6 @@ public class GUI extends JFrame implements ActionListener,MouseListener{
         for (int i = 0; i<nodes.length;i++){
             if (nodes[i].inRange(relX,((double)y/board.getDimension())))nodeNumber=i;
         }
-        
         return nodeNumber;
     }
     
@@ -243,43 +237,104 @@ public class GUI extends JFrame implements ActionListener,MouseListener{
         }
     }
     
+    private boolean checkMill(){
+        
+        if (nodes[0].getNumberTokens() ==1 && nodes[1].getNumberTokens() ==1 &&nodes[2].getNumberTokens() ==1){
+            if ((nodes[0].getTokencolour()== 255 && nodes[1].getTokencolour()== 255 && nodes[2].getTokencolour()==255)||(nodes[0].getTokencolour()== 16711680 && nodes[1].getTokencolour()== 16711680 && nodes[2].getTokencolour()==16711680)){
+                return true;
+            }
+        }
+        if (nodes[0].getNumberTokens() ==1 && nodes[6].getNumberTokens() ==1 &&nodes[13].getNumberTokens() ==1){
+            if ((nodes[0].getTokencolour()== 255 && nodes[6].getTokencolour()== 255 && nodes[13].getTokencolour()==255)||(nodes[0].getTokencolour()== 16711680 && nodes[6].getTokencolour()== 16711680 && nodes[13].getTokencolour()==16711680)){
+                return true;
+            }
+        }
+        if (nodes[2].getNumberTokens() ==1 && nodes[9].getNumberTokens() ==1 &&nodes[15].getNumberTokens() ==1){
+            if ((nodes[2].getTokencolour()== 255 && nodes[9].getTokencolour()== 255 && nodes[15].getTokencolour()==255)||(nodes[2].getTokencolour()== 16711680 && nodes[9].getTokencolour()== 16711680 && nodes[15].getTokencolour()==16711680)){
+                return true;
+            }
+        }
+        if (nodes[13].getNumberTokens() ==1 && nodes[14].getNumberTokens() ==1 &&nodes[15].getNumberTokens() ==1){
+            if ((nodes[13].getTokencolour()== 255 && nodes[14].getTokencolour()== 255 && nodes[15].getTokencolour()==255)||(nodes[13].getTokencolour()== 16711680 && nodes[14].getTokencolour()== 16711680 && nodes[15].getTokencolour()==16711680)){
+                return true;
+            }
+        }
+        if (nodes[3].getNumberTokens() ==1 && nodes[7].getNumberTokens() ==1 &&nodes[10].getNumberTokens() ==1){
+            if ((nodes[3].getTokencolour()== 255 && nodes[7].getTokencolour()== 255 && nodes[10].getTokencolour()==255)||(nodes[3].getTokencolour()== 16711680 && nodes[7].getTokencolour()== 16711680 && nodes[10].getTokencolour()==16711680)){
+                return true;
+            }
+        }
+        if (nodes[3].getNumberTokens() ==1 && nodes[4].getNumberTokens() ==1 &&nodes[5].getNumberTokens() ==1){
+            if ((nodes[3].getTokencolour()== 255 && nodes[4].getTokencolour()== 255 && nodes[5].getTokencolour()==255)||(nodes[3].getTokencolour()== 16711680 && nodes[4].getTokencolour()== 16711680 && nodes[5].getTokencolour()==16711680)){
+                return true;
+            }
+        }
+        if (nodes[10].getNumberTokens() ==1 && nodes[11].getNumberTokens() ==1 &&nodes[12].getNumberTokens() ==1){
+            if ((nodes[10].getTokencolour()== 255 && nodes[11].getTokencolour()== 255 && nodes[12].getTokencolour()==255)||(nodes[10].getTokencolour()== 16711680 && nodes[11].getTokencolour()== 16711680 && nodes[12].getTokencolour()==16711680)){
+                return true;
+            }
+        }
+        if (nodes[5].getNumberTokens() ==1 && nodes[8].getNumberTokens() ==1 &&nodes[12].getNumberTokens() ==1){
+            if ((nodes[5].getTokencolour()== 255 && nodes[8].getTokencolour()== 255 && nodes[12].getTokencolour()==255)||(nodes[5].getTokencolour()== 16711680 && nodes[8].getTokencolour()== 16711680 && nodes[12].getTokencolour()==16711680)){
+                return true;
+            }
+        }
+        return false;
+    }
     
-    
-    
-    
-    //checking screen state and throwing errors if it exists
     private boolean checkScreen(String gamestate){
         
         for (int i=0; i<nodes.length;i++){
             if (nodes[i].getNumberTokens() >1){
                 
                 JOptionPane.showMessageDialog(null, "Pieces Stacked (Highlighted in purple): Choose another spot  ", "Fail", JOptionPane.INFORMATION_MESSAGE);
-                return true;
+                return false;
             }
+        }
+        
+        if (gamestate== "New"){
+            JOptionPane.showMessageDialog(null, "Continue placing pieces until board is full", "Successful", JOptionPane.INFORMATION_MESSAGE);
+            return true;
         }
         
         int player1=Math.abs(players[0].getNumTokens()-6);
         int player2=Math.abs(players[1].getNumTokens()-6);
         
-        if (player1<2 || player2<2){
-            JOptionPane.showMessageDialog(null, "Not Enough Pieces on Board: Need to add more pieces to play", "Fail1", JOptionPane.INFORMATION_MESSAGE);
+        // if either player has token one token on board, or both have 1 successful
+        if ((player1==1 && player2==0) || (player2==1 && player1==0)||(player1==1 && player2==1)){
+            JOptionPane.showMessageDialog(null, "No Errors :)", "Successful", JOptionPane.INFORMATION_MESSAGE);
             
             return false;
         }
-        if (player1==2 && player2==2){
-            JOptionPane.showMessageDialog(null, "Not Enough Pieces on Board: Need to add more pieces to play", "Fail2", JOptionPane.INFORMATION_MESSAGE);
+        // if one player has 3 on board and other has 1, legal only when mill
+        if ((player1==3 && player2==1) || (player2==3 && player1==1)){
             
+            if (checkMill()==true){
+                JOptionPane.showMessageDialog(null, "No Errors :)", "Successful", JOptionPane.INFORMATION_MESSAGE);
+            }
+            
+            JOptionPane.showMessageDialog(null, "Not Legal","Failure", JOptionPane.INFORMATION_MESSAGE);
             return false;
         }
         
-        if (gamestate== "New"){
-            JOptionPane.showMessageDialog(null, "Continue placing pieces until board is full", "Successful", JOptionPane.INFORMATION_MESSAGE);
+        //if any player has less than two while other can have any amount, Fail
+        if (player1<2 || player2<2){
+            JOptionPane.showMessageDialog(null, "Not Enough Pieces on Board: Need to add more pieces to play", "Fail", JOptionPane.INFORMATION_MESSAGE);
+            
+            return false;
         }
+        // if both players have two error to add more pieces, Fail
+        if (player1==2 && player2==2){
+            JOptionPane.showMessageDialog(null, "Not Enough Pieces on Board: Need to add more pieces to play", "Fail", JOptionPane.INFORMATION_MESSAGE);
+            return false;
+        }
+        
         else{
             JOptionPane.showMessageDialog(null, "No Errors :)", "Successful", JOptionPane.INFORMATION_MESSAGE);
             
         }
-        return false;
+        
+        return true;
         
     }
     

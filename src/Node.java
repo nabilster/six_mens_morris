@@ -6,6 +6,7 @@ public class Node {
     private final double relY;
     private int counter;
     
+    
     public Node (double relX, double relY){
         this.relX=relX;
         this.relY=relY;
@@ -33,9 +34,15 @@ public class Node {
         return counter;
     }
     
+    public int getTokencolour(){
+        return getTopToken().getColour();
+    }
+    
     public boolean inRange (double x, double y){
         if (x<1) return ((relX-0.05)<x&&x<(relX+0.05))&&((relY-0.05)<y&&y<(relY+0.05));
         return ((relX-0.05)<x&&x<(relX+0.05))&&((relY-0.05)<y&&y<(relY+0.05));
     }
     
 }
+
+
