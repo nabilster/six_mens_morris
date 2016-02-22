@@ -6,7 +6,6 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.Random;
 
-
 public class GUI extends JFrame implements ActionListener,MouseListener{
     
     private BoardView board = new BoardView();              //view for board
@@ -131,7 +130,6 @@ public class GUI extends JFrame implements ActionListener,MouseListener{
         String text="<html><font color='";
         text += (turnNumber%2==0)?colour1+"'>"+colour1+"'s</font> ":colour2+"'>"+colour2+"'s</font> ";
         text+="turn.</html>";
-        //System.out.println(text);
         turnIndicator.setText(text);
         turnIndicator.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 20));
     }
@@ -156,11 +154,14 @@ public class GUI extends JFrame implements ActionListener,MouseListener{
             revalidate();
         }
         else if (e.getActionCommand().equals("check")){   //when clicked run check
-            if(gameState.equals("New")){
+            if(gameState.equals("New")){ // if new game
                 checkScreen("New");
+                tokenoverflowcheck();//check for tokenstack
+                
             }
-            else{
+            else{//if old game
                 checkScreen("Old");
+                tokenoverflowcheck();//check for tokenstack
             }
         }
     }
@@ -202,8 +203,6 @@ public class GUI extends JFrame implements ActionListener,MouseListener{
                     board.placeToken(nodes[nodeNumber]);
                     playerViews[0].removeToken();
                     
-                    
-                    //System.out.print("\tplaced red\t");
                 }
             }else {                                  //if "blue" player's turn
                 
@@ -213,14 +212,11 @@ public class GUI extends JFrame implements ActionListener,MouseListener{
                     board.placeToken(nodes[nodeNumber]);
                     playerViews[1].removeToken();
                     
-                    
-                    //System.out.print("\tplaced blue\t");
-                    
                 }
             }
             if (!gameState.equals("Old"))turnNumber++; //if the next player goes
             if (players[0].getNumTokens()==0&&players[1].getNumTokens()==0)gameState="Move";//checks if all pieces placed
-            //System.out.println(gameState);
+            
             updateTurn();
             turnIndicator.revalidate();
             revalidate();
@@ -234,45 +230,58 @@ public class GUI extends JFrame implements ActionListener,MouseListener{
         for (int i = 0; i<nodes.length;i++){
             if (nodes[i].inRange(relX,((double)y/board.getDimension())))nodeNumber=i;
         }
-        System.out.print("Node Number: "+nodeNumber+"\t");
+        
         return nodeNumber;
+    }
+    
+    private void tokenoverflowcheck(){
+        for (int i=0; i<nodes.length;i++){
+            if(nodes[i].getNumberTokens()>1){
+                nodes[i].addToken(colour3Code); // adds purple color token if more than one to indicate location
+                board.placeToken(nodes[i]);
+            }
+        }
     }
     
     
     
     
-    //validation for tokenstacks
+    
+    //checking screen state and throwing errors if it exists
     private boolean checkScreen(String gamestate){
         
         for (int i=0; i<nodes.length;i++){
             if (nodes[i].getNumberTokens() >1){
-                nodes[i].addToken(colour3Code); // adds purple color token if more than one to indicate location
-                board.placeToken(nodes[i]);
+                
                 JOptionPane.showMessageDialog(null, "Pieces Stacked (Highlighted in purple): Choose another spot  ", "Fail", JOptionPane.INFORMATION_MESSAGE);
                 return true;
             }
         }
-        boolean test1= players[1].getNumTokens() ==6 && players[1].getNumTokens() >=3;
-        boolean test2= players[1].getNumTokens() ==5 && players[1].getNumTokens() >=3;
-        boolean test3= players[1].getNumTokens() ==4 && players[1].getNumTokens() >=3;
-        boolean test4= players[1].getNumTokens() ==3 && players[1].getNumTokens() >3;
         
-        if (test1|test2|test3|test4 && gamestate != "New"){
-            JOptionPane.showMessageDialog(null, "Not Enough Pieces on Board: Need to add more pieces to play", "Fail", JOptionPane.INFORMATION_MESSAGE);
-            return true;
+        int player1=Math.abs(players[0].getNumTokens()-6);
+        int player2=Math.abs(players[1].getNumTokens()-6);
+        
+        if (player1<2 || player2<2){
+            JOptionPane.showMessageDialog(null, "Not Enough Pieces on Board: Need to add more pieces to play", "Fail1", JOptionPane.INFORMATION_MESSAGE);
+            
+            return false;
         }
+        if (player1==2 && player2==2){
+            JOptionPane.showMessageDialog(null, "Not Enough Pieces on Board: Need to add more pieces to play", "Fail2", JOptionPane.INFORMATION_MESSAGE);
+            
+            return false;
+        }
+        
         if (gamestate== "New"){
             JOptionPane.showMessageDialog(null, "Continue placing pieces until board is full", "Successful", JOptionPane.INFORMATION_MESSAGE);
         }
         else{
-            JOptionPane.showMessageDialog(null, "Your Ready To Start Playing :)", "Successful", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(null, "No Errors :)", "Successful", JOptionPane.INFORMATION_MESSAGE);
             
         }
         return false;
         
     }
-    
-    
     
     public static void main (String [] args){
         //sets the GUI look based on OS

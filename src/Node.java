@@ -5,7 +5,6 @@ public class Node {
     private final double relX;
     private final double relY;
     private int counter;
-    //private Integer[] colourToken= new Integer[16];
     
     public Node (double relX, double relY){
         this.relX=relX;
@@ -25,7 +24,7 @@ public class Node {
         
         counter++;
     }
-
+    
     public Token getTopToken(){
         return tokens.get(tokens.size()-1);
     }
