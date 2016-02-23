@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" build-on-make="true" name="six_mens_morris:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/six_mens_morris_jar</output-path>
+    <root id="archive" name="six_mens_morris.jar">
+      <element id="module-output" name="six_mens_morris" />
+    </root>
+  </artifact>
+</component>

@@ -261,42 +261,42 @@ public class GUI extends JFrame implements ActionListener,MouseListener{
     private boolean checkMill(){ //test cases for validity
         
         if (nodes[0].getNumberTokens() ==1 && nodes[1].getNumberTokens() ==1 &&nodes[2].getNumberTokens() ==1){
-            if ((nodes[0].getTokencolour()== 255 && nodes[1].getTokencolour()== 255 && nodes[2].getTokencolour()==255)||(nodes[0].getTokencolour()== 16711680 && nodes[1].getTokencolour()== 16711680 && nodes[2].getTokencolour()==16711680)){
+            if ((nodes[0].getTopToken().getColour()== 255 && nodes[1].getTopToken().getColour()== 255 && nodes[2].getTopToken().getColour()==255)||(nodes[0].getTopToken().getColour()== 16711680 && nodes[1].getTopToken().getColour()== 16711680 && nodes[2].getTopToken().getColour()==16711680)){
                 return true;
             }
         }
         if (nodes[0].getNumberTokens() ==1 && nodes[6].getNumberTokens() ==1 &&nodes[13].getNumberTokens() ==1){
-            if ((nodes[0].getTokencolour()== 255 && nodes[6].getTokencolour()== 255 && nodes[13].getTokencolour()==255)||(nodes[0].getTokencolour()== 16711680 && nodes[6].getTokencolour()== 16711680 && nodes[13].getTokencolour()==16711680)){
+            if ((nodes[0].getTopToken().getColour()== 255 && nodes[6].getTopToken().getColour()== 255 && nodes[13].getTopToken().getColour()==255)||(nodes[0].getTopToken().getColour()== 16711680 && nodes[6].getTopToken().getColour()== 16711680 && nodes[13].getTopToken().getColour()==16711680)){
                 return true;
             }
         }
         if (nodes[2].getNumberTokens() ==1 && nodes[9].getNumberTokens() ==1 &&nodes[15].getNumberTokens() ==1){
-            if ((nodes[2].getTokencolour()== 255 && nodes[9].getTokencolour()== 255 && nodes[15].getTokencolour()==255)||(nodes[2].getTokencolour()== 16711680 && nodes[9].getTokencolour()== 16711680 && nodes[15].getTokencolour()==16711680)){
+            if ((nodes[2].getTopToken().getColour()== 255 && nodes[9].getTopToken().getColour()== 255 && nodes[15].getTopToken().getColour()==255)||(nodes[2].getTopToken().getColour()== 16711680 && nodes[9].getTopToken().getColour()== 16711680 && nodes[15].getTopToken().getColour()==16711680)){
                 return true;
             }
         }
         if (nodes[13].getNumberTokens() ==1 && nodes[14].getNumberTokens() ==1 &&nodes[15].getNumberTokens() ==1){
-            if ((nodes[13].getTokencolour()== 255 && nodes[14].getTokencolour()== 255 && nodes[15].getTokencolour()==255)||(nodes[13].getTokencolour()== 16711680 && nodes[14].getTokencolour()== 16711680 && nodes[15].getTokencolour()==16711680)){
+            if ((nodes[13].getTopToken().getColour()== 255 && nodes[14].getTopToken().getColour()== 255 && nodes[15].getTopToken().getColour()==255)||(nodes[13].getTopToken().getColour()== 16711680 && nodes[14].getTopToken().getColour()== 16711680 && nodes[15].getTopToken().getColour()==16711680)){
                 return true;
             }
         }
         if (nodes[3].getNumberTokens() ==1 && nodes[7].getNumberTokens() ==1 &&nodes[10].getNumberTokens() ==1){
-            if ((nodes[3].getTokencolour()== 255 && nodes[7].getTokencolour()== 255 && nodes[10].getTokencolour()==255)||(nodes[3].getTokencolour()== 16711680 && nodes[7].getTokencolour()== 16711680 && nodes[10].getTokencolour()==16711680)){
+            if ((nodes[3].getTopToken().getColour()== 255 && nodes[7].getTopToken().getColour()== 255 && nodes[10].getTopToken().getColour()==255)||(nodes[3].getTopToken().getColour()== 16711680 && nodes[7].getTopToken().getColour()== 16711680 && nodes[10].getTopToken().getColour()==16711680)){
                 return true;
             }
         }
         if (nodes[3].getNumberTokens() ==1 && nodes[4].getNumberTokens() ==1 &&nodes[5].getNumberTokens() ==1){
-            if ((nodes[3].getTokencolour()== 255 && nodes[4].getTokencolour()== 255 && nodes[5].getTokencolour()==255)||(nodes[3].getTokencolour()== 16711680 && nodes[4].getTokencolour()== 16711680 && nodes[5].getTokencolour()==16711680)){
+            if ((nodes[3].getTopToken().getColour()== 255 && nodes[4].getTopToken().getColour()== 255 && nodes[5].getTopToken().getColour()==255)||(nodes[3].getTopToken().getColour()== 16711680 && nodes[4].getTopToken().getColour()== 16711680 && nodes[5].getTopToken().getColour()==16711680)){
                 return true;
             }
         }
         if (nodes[10].getNumberTokens() ==1 && nodes[11].getNumberTokens() ==1 &&nodes[12].getNumberTokens() ==1){
-            if ((nodes[10].getTokencolour()== 255 && nodes[11].getTokencolour()== 255 && nodes[12].getTokencolour()==255)||(nodes[10].getTokencolour()== 16711680 && nodes[11].getTokencolour()== 16711680 && nodes[12].getTokencolour()==16711680)){
+            if ((nodes[10].getTopToken().getColour()== 255 && nodes[11].getTopToken().getColour()== 255 && nodes[12].getTopToken().getColour()==255)||(nodes[10].getTopToken().getColour()== 16711680 && nodes[11].getTopToken().getColour()== 16711680 && nodes[12].getTopToken().getColour()==16711680)){
                 return true;
             }
         }
         if (nodes[5].getNumberTokens() ==1 && nodes[8].getNumberTokens() ==1 &&nodes[12].getNumberTokens() ==1){
-            if ((nodes[5].getTokencolour()== 255 && nodes[8].getTokencolour()== 255 && nodes[12].getTokencolour()==255)||(nodes[5].getTokencolour()== 16711680 && nodes[8].getTokencolour()== 16711680 && nodes[12].getTokencolour()==16711680)){
+            if ((nodes[5].getTopToken().getColour()== 255 && nodes[8].getTopToken().getColour()== 255 && nodes[12].getTopToken().getColour()==255)||(nodes[5].getTopToken().getColour()== 16711680 && nodes[8].getTopToken().getColour()== 16711680 && nodes[12].getTopToken().getColour()==16711680)){
                 return true;
             }
         }
