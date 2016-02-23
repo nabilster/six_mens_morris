@@ -6,6 +6,11 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.Random;
 
+/**
+ * The GUI class is a controller for the project.  It handles logic and deals with input, state changes, etc.
+ *
+ * @version 1.0
+ */
 public class GUI extends JFrame implements ActionListener,MouseListener{
     
     private BoardView board = new BoardView();              //view for board
@@ -19,9 +24,11 @@ public class GUI extends JFrame implements ActionListener,MouseListener{
     private Player [] players = new Player[2];              //player model
     private PlayerView [] playerViews=new PlayerView[2];    //player view
     private Node [] nodes = new Node [16];
-    
-    
-    
+
+
+    /**
+     * Initializes JFrame, logic, and states
+     */
     public GUI (){
         initializeNodes();
         
@@ -93,16 +100,16 @@ public class GUI extends JFrame implements ActionListener,MouseListener{
             check.addActionListener(this);
             footer.add(check);
             
-            JLabel player1Lable = new JLabel(colour1,JLabel.CENTER), player2Lable = new JLabel(colour2,JLabel.CENTER);
-            player1Lable.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 20));
+            JLabel player1Label = new JLabel(colour1,JLabel.CENTER), player2Lable = new JLabel(colour2,JLabel.CENTER);
+            player1Label.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 20));
             player2Lable.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 20));
-            player1Lable.setAlignmentX(Component.CENTER_ALIGNMENT);
+            player1Label.setAlignmentX(Component.CENTER_ALIGNMENT);
             player2Lable.setAlignmentX(Component.CENTER_ALIGNMENT);
-            left.add(player1Lable);
+            left.add(player1Label);
             right.add(player2Lable);
         }else if (gameState.equals("Old")) { //if placing tokens, sets up buttons
             
-            JButton player1Button = new JButton(colour1), player2Button = new JButton(colour2), check= new JButton("Check/Begin Game");;
+            JButton player1Button = new JButton(colour1), player2Button = new JButton(colour2), check= new JButton("Check/Begin Game");
             player1Button.setActionCommand("player1");
             player2Button.setActionCommand("player2");
             check.setActionCommand("check");
@@ -125,6 +132,7 @@ public class GUI extends JFrame implements ActionListener,MouseListener{
         right.add(playerViews[1]);
     }
     
+    //Changes the text of the JLable that displays who's turn it is
     private void updateTurn(){
         //sets font colour and changes JLabel's text to reflect turn
         String text="<html><font color='";
@@ -133,14 +141,20 @@ public class GUI extends JFrame implements ActionListener,MouseListener{
         turnIndicator.setText(text);
         turnIndicator.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 20));
     }
-    
+
+    /**
+     * Dictates what actions to take when an action listener is tripped.  Set game mode, changes who is placing pieces,
+     * and activiates validity checks
+     *
+     * @param e information on what tripped the actionlistener
+     */
     public void actionPerformed (ActionEvent e){ //if buttons are pressed
         if (e.getActionCommand().equals("NewG")||e.getActionCommand().equals("OldG")){
             //updates which mode to start
             gameState=(e.getActionCommand().equals("NewG"))?"New":"Old";
             header.removeAll();
             revalidate();
-            header.add(turnIndicator, BorderLayout.NORTH);
+            header.add(turnIndicator, BorderLayout.NORTH); //update header
             header.revalidate();
             initSidePanels();
             revalidate();
@@ -182,7 +196,13 @@ public class GUI extends JFrame implements ActionListener,MouseListener{
     @Override
     public void mousePressed(MouseEvent e) {
     }
-    
+
+    /**
+     * Gets information on mouse when a mouse button is clicked.  Places pieces mostly, but does auxiliary actions
+     * associated with the "end phase" of a players turn
+     *
+     * @param e mouse information
+     */
     @Override
     public void mouseReleased(MouseEvent e) {
         int x=e.getX();
@@ -218,17 +238,18 @@ public class GUI extends JFrame implements ActionListener,MouseListener{
         }
         //System.out.println("Board Width: "+board.getWidth()+" x: "+x+"\tBoard Height: "+board.getHeight()+" y: "+y);
     }
-    
+
+    //goes through the list of nodes and checks if the given coordinates are with a node's hitbox
     private int findNodeNumber (int x, int y){
-        int nodeNumber=-1;
-        double relX = (x-(board.getWidth()/2.0))/board.getDimension();
+        int nodeNumber=-1; //initial value
+        double relX = (x-(board.getWidth()/2.0))/board.getDimension(); //x's value relative to the top center of the panel
         for (int i = 0; i<nodes.length;i++){
-            if (nodes[i].inRange(relX,((double)y/board.getDimension())))nodeNumber=i;
+            if (nodes[i].inRange(relX,((double)y/board.getDimension())))nodeNumber=i; //check if coordinates are in range
         }
         return nodeNumber;
     }
     
-    private void tokenoverflowcheck(){
+    private void tokenoverflowcheck(){ //checks if tokens were stacked on top of each other
         for (int i=0; i<nodes.length;i++){
             if(nodes[i].getNumberTokens()>1){
                 nodes[i].addToken(colour3Code); // adds purple color token if more than one to indicate location
@@ -237,7 +258,7 @@ public class GUI extends JFrame implements ActionListener,MouseListener{
         }
     }
     
-    private boolean checkMill(){
+    private boolean checkMill(){ //test cases for validity
         
         if (nodes[0].getNumberTokens() ==1 && nodes[1].getNumberTokens() ==1 &&nodes[2].getNumberTokens() ==1){
             if ((nodes[0].getTokencolour()== 255 && nodes[1].getTokencolour()== 255 && nodes[2].getTokencolour()==255)||(nodes[0].getTokencolour()== 16711680 && nodes[1].getTokencolour()== 16711680 && nodes[2].getTokencolour()==16711680)){
@@ -282,7 +303,7 @@ public class GUI extends JFrame implements ActionListener,MouseListener{
         return false;
     }
     
-    private boolean checkScreen(String gamestate){
+    private boolean checkScreen(String gamestate){ //pop up
         
         for (int i=0; i<nodes.length;i++){
             if (nodes[i].getNumberTokens() >1){
@@ -292,7 +313,7 @@ public class GUI extends JFrame implements ActionListener,MouseListener{
             }
         }
         
-        if (gamestate== "New"){
+        if (gamestate.equals("New")){
             JOptionPane.showMessageDialog(null, "Continue placing pieces until board is full", "Successful", JOptionPane.INFORMATION_MESSAGE);
             return true;
         }
@@ -309,7 +330,7 @@ public class GUI extends JFrame implements ActionListener,MouseListener{
         // if one player has 3 on board and other has 1, legal only when mill
         if ((player1==3 && player2==1) || (player2==3 && player1==1)){
             
-            if (checkMill()==true){
+            if (checkMill()){
                 JOptionPane.showMessageDialog(null, "No Errors :)", "Successful", JOptionPane.INFORMATION_MESSAGE);
             }
             
@@ -337,7 +358,12 @@ public class GUI extends JFrame implements ActionListener,MouseListener{
         return true;
         
     }
-    
+
+    /**
+     * Main class of project.  Initializes window with parameters and instructions on size, visibility, etc.
+     *
+     * @param args not used
+     */
     public static void main (String [] args){
         //sets the GUI look based on OS
         try {
