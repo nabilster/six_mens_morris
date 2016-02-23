@@ -216,7 +216,7 @@ public class GUI extends JFrame implements ActionListener,MouseListener{
             turnIndicator.revalidate();
             revalidate();
         }
-        System.out.println("Board Width: "+board.getWidth()+" x: "+x+"\tBoard Height: "+board.getHeight()+" y: "+y);
+        //System.out.println("Board Width: "+board.getWidth()+" x: "+x+"\tBoard Height: "+board.getHeight()+" y: "+y);
     }
     
     private int findNodeNumber (int x, int y){
