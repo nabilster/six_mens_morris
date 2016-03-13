@@ -1,33 +1,18 @@
+package six_mens_morris;
+
 import javax.swing.*;
 import java.awt.*;
 
-/**
- * Panel for displaying a player's remaining tokens and colour (view for player)
- *
- * @version 1.0
- */
 public class PlayerView extends JPanel{
     private int numTokens; //number of tokens they have
     private int colour; //colour they have
 
-    /**
-     * Initialises player with colour and number tokens to draw
-     *
-     * @param colour    colour of a player, taken as the hexadecimal colour code converted to an integer
-     * @param numTokens number of tokens a player starts with
-     */
     public PlayerView(int colour,int numTokens){
         this.numTokens=numTokens;
         this.colour=colour;
-        setAlignmentX(Component.CENTER_ALIGNMENT); //align anything to be drawn to the center of the panel
+        setAlignmentX(Component.CENTER_ALIGNMENT);
     }
 
-    /**
-     * Draws shapes, images, etc. in panel behind any elements (eg. labels, other panels, etc.)
-     *
-     * {@inheritDoc}
-     * @param g
-     */
     @Override
     protected void paintComponent(Graphics g) { //draws the number of tokens left
         super.paintComponent(g);
@@ -38,9 +23,6 @@ public class PlayerView extends JPanel{
         }
     }
 
-    /**
-     * specifies that one less token should be drawn
-     */
     public void removeToken (){
         numTokens--;
         repaint();
