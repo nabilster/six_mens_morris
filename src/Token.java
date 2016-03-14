@@ -1,5 +1,3 @@
-package six_mens_morris;
-
 
 //this class is used to represent a token (piece)  
 

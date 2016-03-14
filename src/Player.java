@@ -1,10 +1,3 @@
-package six_mens_morris;
-
-import java.util.ArrayList;
-
-/**
- * Created by mooyl on 2016-02-18.
- */
 public class Player {
     private int numTokens; //number of tokens
     private int colour; //colour

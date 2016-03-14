@@ -1,12 +1,14 @@
-package six_mens_morris;
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.ArrayList;
 import java.util.Random;
+import java.util.Scanner;
 
 public class GUI extends JFrame implements ActionListener,MouseListener{
 
@@ -62,7 +64,39 @@ public class GUI extends JFrame implements ActionListener,MouseListener{
 	//these are now relative to the center of the board panel due to the fact that the board image is centered with the
 	//panel, this is the easier way for tracking,  although is does cause some more complicated math
 	private void initializeNodes(){
-		nodes=Node.getNodesList();
+        Scanner fin;
+        String [] tempString;
+        double [] tempDouble;
+        ArrayList<double []> nodeInfo = new ArrayList<>();
+        try{
+            fin = new Scanner (new File("board.smm"));
+            while (fin.hasNextLine()){
+                tempString=fin.nextLine().split("/");
+                tempDouble=new double[tempString.length];
+                for (int i = 0;i<tempDouble.length;i++){
+                    tempDouble[i]=Double.parseDouble(tempString[i]);
+                }
+                nodeInfo.add(tempDouble);
+            }
+            for (int i = 0; i<nodes.length;i++){
+                nodes[i]=new Node(nodeInfo.get(i)[0],nodeInfo.get(i)[1],i);
+            }
+            for (int i = 0; i<nodes.length; i++){
+                Node [] nodeArray = new Node[4];
+                for (int j=0; j<nodeArray.length; j++){
+                    System.out.println(nodeInfo.get(i)[j+2]);
+                    if (nodeInfo.get(i)[j+2]!=-1){nodeArray[j]=nodes[(int)nodeInfo.get(i)[j+2]];}
+                    else {nodeArray[j]=null;}
+                }
+                nodes[i].setConnectedNodes(nodeArray);
+            }
+        }catch (FileNotFoundException e1){
+            System.out.println("CANNOT READ FILE");
+            //TODO Add can't play game
+        }catch (IndexOutOfBoundsException e2){
+            //TODO Error message
+            System.out.println("FILE CONTENT ERROR");
+        }
 	}
 
 	//sets up side and bottom panels
@@ -130,11 +164,11 @@ public class GUI extends JFrame implements ActionListener,MouseListener{
 			turnNumber=0;
 			updateTurn();
 			revalidate();
-		}else if (e.getActionCommand().equals("player2")){
-			turnNumber=1;
-			updateTurn();
-			revalidate();
-		}
+		}else if (e.getActionCommand().equals("player2")) {
+            turnNumber = 1;
+            updateTurn();
+            revalidate();
+        }
 		else if (e.getActionCommand().equals("check")){   //when clicked run check 
 			if(gameState.equals("New")){ // if new game
 				Check.checkScreen("New",nodes,players);
@@ -145,6 +179,7 @@ public class GUI extends JFrame implements ActionListener,MouseListener{
 				Check.checkScreen("Old",nodes,players);
 				Check.tokenoverflowcheck(nodes,colour3Code,board);//check for tokenstack
 			}
+
 		}
 	}
 
@@ -170,7 +205,7 @@ public class GUI extends JFrame implements ActionListener,MouseListener{
 		int x=e.getX();
 		int y=e.getY();
 
-		int nodeNumber = findNodeNumber(x,y);
+		int nodeNumber = findNodeNumber(x, y);
 
 
 		if (e.getButton()==1&&!gameState.equals("")&&nodeNumber!=-1){           //if the correct mouse button is pressed and pieces are

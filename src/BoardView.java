@@ -1,4 +1,3 @@
-package six_mens_morris;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
