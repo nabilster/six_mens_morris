@@ -9,6 +9,9 @@ import java.util.ArrayList;
 public class BoardView extends JPanel {
     private BufferedImage image;    //board's image
     private ArrayList<double[]> tokens = new ArrayList<>(); //array of tokens, may replace with nodes, idk
+    private double [] highlight=new double[2];
+    private static final double nullVal = -100; //used to set double values to "null"
+    private double highlightSize=0.15;
 
     public BoardView (){ //loads board
         try {
@@ -16,18 +19,39 @@ public class BoardView extends JPanel {
         }catch (IOException e){
             add (new JLabel("Board could not be loaded"));
         }
+        highlight[0]=nullVal;
         setBorder(BorderFactory.createLineBorder(Color.black));
+    }
+
+    public void highlightNode (Node node){
+        highlight[0]=node.getRelX();
+        highlight[1]=node.getRelY();
+        repaint();
+    }
+
+    public void clearHighlight(){
+        highlight[0]=nullVal;
+        repaint();
     }
 
     @Override
     protected void paintComponent(Graphics g) { //draws board and tokens
         super.paintComponent(g);
         g.drawImage(image, getWidth() / 2 - getDimension() / 2, 0, getDimension(), getDimension(), null); // see javadoc for more info on the parameters
+        if (highlight[0]!=nullVal){
+            g.setColor(new Color(0x00BC0E));
+            g.fillOval((int)(highlight[0]*getDimension()+getWidth()/2.0)-offset(highlightSize,20),(int)(highlight[1]*
+                    getDimension())-offset(highlightSize,20), offset(highlightSize,10), offset(highlightSize,10));
+        }
         for (double[] t:tokens) {
             g.setColor(new Color((int)t[0]));
-            g.fillOval((int)(t[1]*getDimension()+getWidth()/2.0)-getDimension()/20,(int)(t[2]*getDimension())-getDimension()/20,getDimension()/10,getDimension()/10);
+            g.fillOval((int)(t[1]*getDimension()+getWidth()/2.0)-offset(0,20),(int)(t[2]*getDimension())-
+                    offset(0, 20),offset(0,10),offset(0,10));
         }
+    }
 
+    private int offset (double percent, int divisor){
+        return (int)((getDimension()+getDimension()*percent)/divisor);
     }
 
     public int getDimension (){
@@ -38,6 +62,28 @@ public class BoardView extends JPanel {
     public void placeToken(Node node){ //place new token
         double [] tokenInfo= {node.getTopToken().colour,node.getRelX(),node.getRelY()};
         tokens.add(tokenInfo);
+        repaint();
+    }
+
+    public void moveToken (double oldX, double oldY, double newX, double newY){
+        int i=0;
+        while (i<tokens.size()){
+            if (tokens.get(i)[1]==oldX&&tokens.get(i)[2]==oldY){
+                tokens.get(i)[1]=newX; tokens.get(i)[2]=newY;
+                clearHighlight();
+                repaint();
+                break;
+            }
+            i++;
+        }
+    }
+
+    public void changeBoardImage (File newFile){
+        try {
+            image = ImageIO.read(newFile);
+        }catch (IOException e){
+            add (new JLabel("Board could not be loaded"));
+        }
         repaint();
     }
 

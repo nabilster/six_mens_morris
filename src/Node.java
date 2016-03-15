@@ -5,7 +5,6 @@ public class Node {
     private ArrayList<Token> tokens = new ArrayList<>();
     private final double relX;
     private final double relY;
-    private int counter;
     private final int nodeNumber;
     private Node [] connected;
 
@@ -31,8 +30,10 @@ public class Node {
 
     public void addToken(int colour) {
         this.tokens.add(new Token(colour));
+    }
 
-        counter++;
+    public void addToken(Token token){
+        tokens.add(token);
     }
 
     public Token getTopToken() {
@@ -40,7 +41,7 @@ public class Node {
     }
 
     public int getNumberTokens() {
-        return counter;
+        return tokens.size();
     }
 
     public int getTokencolour() {
@@ -56,9 +57,13 @@ public class Node {
         return nodeNumber;
     }
 
-    public boolean isConnected (int checkNodeNumber){
-        return (connected[0].getNodeNumber()==checkNodeNumber)||(connected[1].getNodeNumber()==checkNodeNumber)||
-                (connected[2].getNodeNumber()==nodeNumber)||(connected[4].getNodeNumber()==nodeNumber);
+    public boolean isConnectedTo (int checkNodeNumber){
+        for (Node node:connected){
+            if (node!=null) {
+                if (node.getNodeNumber() == checkNodeNumber) return true;
+            }
+        }
+        return false;
     }
 
     public int getLeft (){
@@ -75,6 +80,15 @@ public class Node {
 
     public int getDown (){
         return connected[3].getNodeNumber();
+    }
+
+    public void removeTopToken(){
+        tokens.remove(tokens.size()-1);
+    }
+
+    public void moveToken (Node to){
+        to.addToken(getTopToken());
+        removeTopToken();
     }
 
 }

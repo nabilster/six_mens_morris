@@ -1,16 +1,14 @@
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.io.File;
-import java.io.FileNotFoundException;
+import java.awt.event.*;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.Scanner;
 
-public class GUI extends JFrame implements ActionListener,MouseListener{
+//TODO check if no moves are possible (Pieces are Trapped!)
+
+public class GUI extends JFrame implements ActionListener,MouseListener,KeyListener{
 
 	private BoardView board = new BoardView();              //view for board
 	private  String colour1 = "red", colour2 = "blue";      //colour names
@@ -22,7 +20,9 @@ public class GUI extends JFrame implements ActionListener,MouseListener{
 	private JPanel header = new JPanel(), left=new JPanel(),right=new JPanel(); //Panels
 	private Player [] players = new Player[2];              //player model
 	private PlayerView [] playerViews=new PlayerView[2];    //player view
-	private Node [] nodes = new Node [16];				
+	private Node [] nodes = new Node [16];
+    private int selectedNumber;
+    private int Contra=0;
 
 
 
@@ -59,6 +59,8 @@ public class GUI extends JFrame implements ActionListener,MouseListener{
 		getContentPane().add(left,BorderLayout.WEST);
 		getContentPane().add(right,BorderLayout.EAST);
 		getContentPane().add(footer,BorderLayout.SOUTH);
+        getContentPane().addKeyListener(this);
+        getContentPane().setFocusable(true);
 	}
 
 	//these are now relative to the center of the board panel due to the fact that the board image is centered with the
@@ -84,7 +86,6 @@ public class GUI extends JFrame implements ActionListener,MouseListener{
             for (int i = 0; i<nodes.length; i++){
                 Node [] nodeArray = new Node[4];
                 for (int j=0; j<nodeArray.length; j++){
-                    System.out.println(nodeInfo.get(i)[j+2]);
                     if (nodeInfo.get(i)[j+2]!=-1){nodeArray[j]=nodes[(int)nodeInfo.get(i)[j+2]];}
                     else {nodeArray[j]=null;}
                 }
@@ -109,13 +110,13 @@ public class GUI extends JFrame implements ActionListener,MouseListener{
 			check.addActionListener(this);
 			footer.add(check);
 
-			JLabel player1Lable = new JLabel(colour1,JLabel.CENTER), player2Lable = new JLabel(colour2,JLabel.CENTER);
-			player1Lable.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 20));
-			player2Lable.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 20));
-			player1Lable.setAlignmentX(Component.CENTER_ALIGNMENT);
-			player2Lable.setAlignmentX(Component.CENTER_ALIGNMENT);
-			left.add(player1Lable);
-			right.add(player2Lable);
+			JLabel player1Label = new JLabel(colour1,JLabel.CENTER), player2Label = new JLabel(colour2,JLabel.CENTER);
+			player1Label.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 20));
+			player2Label.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 20));
+			player1Label.setAlignmentX(Component.CENTER_ALIGNMENT);
+			player2Label.setAlignmentX(Component.CENTER_ALIGNMENT);
+			left.add(player1Label);
+			right.add(player2Label);
 		}else if (gameState.equals("Old")) { //if placing tokens, sets up buttons
 
 			JButton player1Button = new JButton(colour1), player2Button = new JButton(colour2), check= new JButton("Check/Begin Game");;
@@ -148,6 +149,8 @@ public class GUI extends JFrame implements ActionListener,MouseListener{
 		text+="turn.</html>";
 		turnIndicator.setText(text);
 		turnIndicator.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 20));
+        turnIndicator.revalidate();
+        revalidate();
 	}
 
 	public void actionPerformed (ActionEvent e){ //if buttons are pressed
@@ -163,11 +166,9 @@ public class GUI extends JFrame implements ActionListener,MouseListener{
 		}else if (e.getActionCommand().equals("player1")){//for placing pieces
 			turnNumber=0;
 			updateTurn();
-			revalidate();
 		}else if (e.getActionCommand().equals("player2")) {
             turnNumber = 1;
             updateTurn();
-            revalidate();
         }
 		else if (e.getActionCommand().equals("check")){   //when clicked run check 
 			if(gameState.equals("New")){ // if new game
@@ -204,37 +205,65 @@ public class GUI extends JFrame implements ActionListener,MouseListener{
 	public void mouseReleased(MouseEvent e) {
 		int x=e.getX();
 		int y=e.getY();
-
 		int nodeNumber = findNodeNumber(x, y);
+        if (e.getButton()==1&&!gameState.equals("")&&nodeNumber!=-1){           //if the correct mouse button is pressed and pieces are
 
+            System.out.println("Board Width: "+board.getWidth()+" x: "+x+"\tBoard Height: "+board.getHeight()+" y: "+y+ "" +
+                    "   \tTurn Number: "+turnNumber+"\tGame State: "+gameState);
 
-		if (e.getButton()==1&&!gameState.equals("")&&nodeNumber!=-1){           //if the correct mouse button is pressed and pieces are
-			//being placed
-
-			if (turnNumber%2==0){                   //if "red" player's turn	
-
-				if (players[0].removeToken()){
-					nodes[nodeNumber].addToken(colour1Code);
-					board.placeToken(nodes[nodeNumber]);
-					playerViews[0].removeToken();
-				}
-			}else {                                  //if "blue" player's turn
-
-				if (players[1].removeToken()){
-					nodes[nodeNumber].addToken(colour2Code); 	
-					board.placeToken(nodes[nodeNumber]);
-					playerViews[1].removeToken();
-				}
-			}
-			if (!gameState.equals("Old"))turnNumber++; //if the next player goes
-			if (players[0].getNumTokens()==0&&players[1].getNumTokens()==0)gameState="Move";//checks if all pieces placed
-
-			updateTurn();
-			turnIndicator.revalidate();
-			revalidate();
+            if (gameState.equals("New")) {
+                //being placed
+                placePiece(turnNumber % 2, nodeNumber);
+                //if (!gameState.equals("Old"))turnNumber++; //if the next player goes
+                if (players[0].getNumTokens() == 0 && players[1].getNumTokens() == 0)
+                    gameState = "Move";//checks if all pieces placed
+                updateTurn();
+            }else if (gameState.equals("Move")){
+                if (canSelect(nodeNumber)){
+                    selectedNumber=nodeNumber;
+                    board.highlightNode(nodes[nodeNumber]);
+                    gameState="Place";
+                }
+            }else if (gameState.equals("Place")){
+                if (nodes[selectedNumber].isConnectedTo(nodeNumber)&&nodes[nodeNumber].getNumberTokens()==0){
+                    nodes[selectedNumber].moveToken(nodes[nodeNumber]);
+                    board.moveToken(nodes[selectedNumber].getRelX(), nodes[selectedNumber].getRelY(),
+                            nodes[nodeNumber].getRelX(), nodes[nodeNumber].getRelY());
+                    turnNumber++;
+                    updateTurn();
+                    gameState="Move";
+                }else if (nodes[selectedNumber]==nodes[nodeNumber]){
+                    selectedNumber=-1;
+                    board.clearHighlight();
+                    gameState="Move";
+                }else{
+                    JOptionPane.showMessageDialog(null, "Cannot move piece to selected node", "Six Men's Morris", JOptionPane.INFORMATION_MESSAGE);
+                }
+            }
 		}
-		System.out.println("Board Width: "+board.getWidth()+" x: "+x+"\tBoard Height: "+board.getHeight()+" y: "+y);
 	}
+
+    private boolean canSelect (int nodeNumber) {
+        if (nodes [nodeNumber].getNumberTokens()<1)return false;
+        if (turnNumber%2==0&&nodes[nodeNumber].getTokencolour()==colour2Code)return false;
+        else if (turnNumber%2==1&&nodes[nodeNumber].getTokencolour()==colour1Code)return false;
+        else return true;
+    }
+
+    private void placePiece (int pNum, int NN){
+        int colour = (pNum==0)?colour1Code:colour2Code;
+        if (players[pNum].removeToken()&&nodes[NN].getNumberTokens()==0) {
+            nodes[NN].addToken(colour);
+            board.placeToken(nodes[NN]);
+            playerViews[pNum].removeToken();
+            turnNumber++;
+        }else{
+            players[pNum].addToken();
+            if (nodes[NN].getNumberTokens()>0){
+                JOptionPane.showMessageDialog(null, "Piece is already placed at selected node","Six Men's Morris",JOptionPane.INFORMATION_MESSAGE);
+            }
+        }
+    }
 
 	private int findNodeNumber (int x, int y){
 		int nodeNumber=-1;
@@ -244,6 +273,56 @@ public class GUI extends JFrame implements ActionListener,MouseListener{
 		}
 		return nodeNumber;
 	}
+
+    private void saveGame(String filename){
+        try{
+            PrintWriter fout = new PrintWriter(new File(filename+".sav"));
+            fout.println(turnNumber % 2);
+            fout.println(gameState);
+            for (Node node: nodes){
+                while (node.getNumberTokens()>0){
+                    fout.println(node.getNodeNumber() + "|" + node.getTokencolour());
+                    node.removeTopToken();
+                }
+            }
+            fout.close();
+        }catch (IOException e){
+            System.out.println("Error writing to save file!");
+        }
+    }
+
+    private void loadGame (String filename){
+        String [] line= new String[2];
+        int nodeNumber;
+        try{
+            Scanner fin = new Scanner(new File (filename+".txt"));
+            if (fin.hasNextLine()){
+                line[0] = fin.nextLine();
+                turnNumber=Integer.parseInt(line[0]);
+            }else {
+                throw new IllegalStateException("STOP TAMPERING");//TODO change to custom exception?
+            }if (fin.hasNextLine()){
+                gameState = fin.nextLine();
+            }else{
+                throw new IllegalStateException("STOP TAMPERING");
+            }while (fin.hasNextLine()){
+                line=fin.nextLine().split("|");
+                nodeNumber=Integer.parseInt(line[0]);
+                nodes[nodeNumber].addToken(Integer.parseInt(line[1]));
+            }
+        }catch (FileNotFoundException e){
+            System.out.println("Error reading from file!");
+        }catch (NumberFormatException e){
+            System.out.println("Save file corrupted.  Cannot load fle.  (Error code: 314159265");
+        }catch (IllegalStateException e){
+            System.out.println("Save file corrupted.  Cannot load file.  (Error code: 11235813");
+        }catch (IndexOutOfBoundsException e){
+            System.out.println("Save file not compatible with game set-up (board.smm has been modified).");
+        }catch (Exception e){
+            System.out.print("Program has encountered an unknown error: ");
+            System.out.println(e);
+        }
+    }
 
 
 
@@ -262,4 +341,53 @@ public class GUI extends JFrame implements ActionListener,MouseListener{
 		gui.setVisible(true);
 
 	}
+
+    @Override
+    public void keyTyped(KeyEvent e) {
+    }
+
+    @Override
+    public void keyPressed(KeyEvent e) {
+        int keyCode = e.getKeyCode();
+        boolean badKey=false;
+        switch (Contra){
+            case 0:case 1:  if (keyCode==KeyEvent.VK_UP) {Contra++;}
+            else {badKey=true;}
+                break;
+            case 2:case 3:  if (keyCode==KeyEvent.VK_DOWN) {Contra++;}
+            else {badKey=true;}
+                break;
+            case 4:case 6:  if (keyCode==KeyEvent.VK_LEFT) {Contra++;}
+            else {badKey=true;}
+                break;
+            case 5:case 7:  if (keyCode==KeyEvent.VK_RIGHT) {Contra++;}
+            else {badKey=true;}
+                break;
+            case 8:  if (keyCode==KeyEvent.VK_B) {Contra++;}
+            else {badKey=true;}
+                break;
+            case 9:  if (keyCode==KeyEvent.VK_A) {Contra++;}
+            else {badKey=true;}
+                break;
+            case 10:  if (keyCode==KeyEvent.VK_ENTER) {changeBoard(); Contra=0;}
+            else {badKey=true;}
+                break;
+        }
+        if (badKey){badKey=false; Contra=0;}
+    }
+
+    @Override
+    public void keyReleased(KeyEvent e) {
+
+    }
+
+    public void changeBoard (){
+        try {
+            File folder = new File("."+File.separator+"Contra");
+            File [] listOfFiles = folder.listFiles();
+            Random rng = new Random();
+            int image = rng.nextInt(listOfFiles.length);
+            board.changeBoardImage(listOfFiles[image]);
+        }catch (Exception ignored){}
+    }
 }
