@@ -66,25 +66,35 @@ public class Node {
         return false;
     }
 
+    //SHOULD WORK.  IF NOT, SHOULEN'T BE HARD TO FIX
     public int getLeft (){
-        return connected[0].getNodeNumber();
+        return nodeExists(0);
     }
 
     public int getRight (){
-        return connected[1].getNodeNumber();
+        return nodeExists(1);
     }
 
     public int getUp (){
-        return connected[2].getNodeNumber();
+        return nodeExists(2);
     }
 
     public int getDown (){
-        return connected[3].getNodeNumber();
+        return nodeExists(3);
     }
 
+	private int nodeExists (int index){
+		if (connected[index]==null){
+			return -1;
+		}else {
+			return connected[index].getNodeNumber();
+		}
+	}
+	
     public void removeTopToken(){
         tokens.remove(tokens.size()-1);
     }
+	
 
     public void moveToken (Node to){
         to.addToken(getTopToken());
