@@ -1,5 +1,3 @@
-package six_mens_morris;
-
 import javax.swing.*;
 import java.awt.*;
 
