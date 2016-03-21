@@ -10,8 +10,8 @@ public class BoardView extends JPanel {
     private BufferedImage image;    //board's image
     private ArrayList<double[]> tokens = new ArrayList<>(); //array of tokens, may replace with nodes, idk
     private double [] highlight=new double[2];
-    private static final double nullVal = -100; //used to set double values to "null"
-    private double highlightSize=0.15;
+    private final double nullVal = -100; //used to set double values to "null"
+    private final double highlightSize=0.15;
 
     public BoardView (){ //loads board
         try {

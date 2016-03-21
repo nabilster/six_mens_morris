@@ -5,6 +5,7 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.Scanner;
+import java.util.Stack;
 
 //TODO check if no moves are possible (Pieces are Trapped!)
 
@@ -16,7 +17,7 @@ public class GUI extends JFrame implements ActionListener,MouseListener,KeyListe
 	private JLabel turnIndicator = new JLabel("",JLabel.CENTER);   //label for whose turn
 	private JPanel footer = new JPanel();                   //footer panel
 	private int turnNumber;                                 //keeps track of whose turn it is
-	String gameState="";                                    //game state
+	private String gameState="";                                    //game state
 	private JPanel header = new JPanel(), left=new JPanel(),right=new JPanel(); //Panels
 	private Player [] players = new Player[2];              //player model
 	private PlayerView [] playerViews=new PlayerView[2];    //player view
@@ -274,14 +275,21 @@ public class GUI extends JFrame implements ActionListener,MouseListener,KeyListe
 	}
 
     private void saveGame(String filename){
+        Stack <Integer> colours= new Stack<>();
         try{
             PrintWriter fout = new PrintWriter(new File(filename+".sav"));
             fout.println(turnNumber % 2);
             fout.println(gameState);
+            fout.println(players[0].getNumTokens());
+            fout.println(players[1].getNumTokens());
             for (Node node: nodes){
                 while (node.getNumberTokens()>0){
                     fout.println(node.getNodeNumber() + "|" + node.getTokencolour());
+                    colours.push(node.getTokencolour());
                     node.removeTopToken();
+                }
+                while (!colours.empty()){
+                    node.addToken(colours.pop());
                 }
             }
             fout.close();
@@ -304,7 +312,15 @@ public class GUI extends JFrame implements ActionListener,MouseListener,KeyListe
                 gameState = fin.nextLine();
             }else{
                 throw new IllegalStateException("STOP TAMPERING");
-            }while (fin.hasNextLine()){
+            }
+            for (int i = 0; i<2; i++){
+                if (fin.hasNextLine()){
+                    players[0]=new Player(players[0].getColour(),Integer.parseInt(fin.nextLine()));
+                }else{
+                    throw new IllegalStateException("STOP TAMPERING");
+                }
+            }
+            while (fin.hasNextLine()){
                 line=fin.nextLine().split("|");
                 nodeNumber=Integer.parseInt(line[0]);
                 nodes[nodeNumber].addToken(Integer.parseInt(line[1]));
@@ -312,9 +328,9 @@ public class GUI extends JFrame implements ActionListener,MouseListener,KeyListe
         }catch (FileNotFoundException e){
             System.out.println("Error reading from file!");
         }catch (NumberFormatException e){
-            System.out.println("Save file corrupted.  Cannot load fle.  (Error code: 314159265");
+            System.out.println("Save file corrupted.  Cannot load fle.  (Error code: 314159265)");
         }catch (IllegalStateException e){
-            System.out.println("Save file corrupted.  Cannot load file.  (Error code: 11235813");
+            System.out.println("Save file corrupted.  Cannot load file.  (Error code: 11235813)");
         }catch (IndexOutOfBoundsException e){
             System.out.println("Save file not compatible with game set-up (board.smm has been modified).");
         }catch (Exception e){
@@ -380,7 +396,7 @@ public class GUI extends JFrame implements ActionListener,MouseListener,KeyListe
 
     }
 
-    public void changeBoard (){
+    private void changeBoard (){
         try {
             File folder = new File("."+File.separator+"Contra");
             File [] listOfFiles = folder.listFiles();
