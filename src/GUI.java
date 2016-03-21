@@ -227,8 +227,7 @@ public class GUI extends JFrame implements ActionListener,MouseListener,KeyListe
             }else if (gameState.equals("Place")){
                 if (nodes[selectedNumber].isConnectedTo(nodeNumber)&&nodes[nodeNumber].getNumberTokens()==0){
                     nodes[selectedNumber].moveToken(nodes[nodeNumber]);
-                    board.moveToken(nodes[selectedNumber].getRelX(), nodes[selectedNumber].getRelY(),
-                            nodes[nodeNumber].getRelX(), nodes[nodeNumber].getRelY());
+                    board.moveToken(nodes[selectedNumber], nodes[nodeNumber]);
                     turnNumber++;
                     updateTurn();
                     gameState="Move";

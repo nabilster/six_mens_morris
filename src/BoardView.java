@@ -65,8 +65,9 @@ public class BoardView extends JPanel {
         repaint();
     }
 
-    public void moveToken (double oldX, double oldY, double newX, double newY){
+    public void moveToken (Node oldNode, Node newNode){
         int i=0;
+        double oldX=oldNode.getRelX(), oldY=oldNode.getRelY(), newX=newNode.getRelX(), newY=newNode.getRelY();
         while (i<tokens.size()){
             if (tokens.get(i)[1]==oldX&&tokens.get(i)[2]==oldY){
                 tokens.get(i)[1]=newX; tokens.get(i)[2]=newY;
