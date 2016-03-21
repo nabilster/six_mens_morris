@@ -1,8 +1,7 @@
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Stack;
 
 public class Node {
-    private ArrayList<Token> tokens = new ArrayList<>();
+    private Stack<Token> tokens = new Stack<>();
     private final double relX;
     private final double relY;
     private final int nodeNumber;
@@ -66,7 +65,6 @@ public class Node {
         return false;
     }
 
-    //SHOULD WORK.  IF NOT, SHOULEN'T BE HARD TO FIX
     public int getLeft (){
         return nodeExists(0);
     }
