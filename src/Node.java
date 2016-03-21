@@ -1,5 +1,8 @@
 import java.util.Stack;
 
+/**
+ * 
+ */
 public class Node {
     private Stack<Token> tokens = new Stack<>();
     private final double relX;
