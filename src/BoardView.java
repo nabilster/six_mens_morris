@@ -66,17 +66,28 @@ public class BoardView extends JPanel {
     }
 
     public void moveToken (Node oldNode, Node newNode){
-        int i=0;
         double oldX=oldNode.getRelX(), oldY=oldNode.getRelY(), newX=newNode.getRelX(), newY=newNode.getRelY();
+        int node = findNode(oldX, oldY);
+        tokens.get(node)[1]=newX; tokens.get(node)[2]=newY;
+        clearHighlight();
+        repaint();
+    }
+
+    public void removeToken (double relX, double relY){
+        int node = findNode(relX, relY);
+        tokens.remove(node);
+        repaint();
+    }
+
+    private int findNode (double relX, double relY){
+        int i=0;
         while (i<tokens.size()){
-            if (tokens.get(i)[1]==oldX&&tokens.get(i)[2]==oldY){
-                tokens.get(i)[1]=newX; tokens.get(i)[2]=newY;
-                clearHighlight();
-                repaint();
-                break;
+            if (tokens.get(i)[1]==relX&&tokens.get(i)[2]==relY){
+                return i;
             }
             i++;
         }
+        return -1;
     }
 
     public void changeBoardImage (File newFile){
