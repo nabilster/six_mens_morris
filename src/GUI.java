@@ -224,31 +224,27 @@ public class GUI extends JFrame implements ActionListener, MouseListener, KeyLis
 			open_Save_Menu();//show buttons
 			if (e.getActionCommand().equals("s1")) {//save game one is pressed
 				saveGame("game1");
-				setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);//
 			}
 			if (e.getActionCommand().equals("s2")) {
 				saveGame("game2");
-				setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 			}
 			if (e.getActionCommand().equals("s3")) {
 				saveGame("game3");
-				setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 			}
+			initSidePanels();//clears the buttons
 		} else if (e.getActionCommand().equals("loadgame")) {//load is pressed
 			//same as above but with load
 			open_Save_Menu();
 			if (e.getActionCommand().equals("s1")) {
 				loadGame("game1");
-				setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 			}
 			if (e.getActionCommand().equals("s2")) {
 				loadGame("game2");
-				setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 			}
 			if (e.getActionCommand().equals("s3")) {
 				loadGame("game3");
-				setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 			}
+			initSidePanels();//clears the buttons
 		}
 	}
 
