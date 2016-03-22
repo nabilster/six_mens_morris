@@ -129,10 +129,8 @@ public class GUI extends JFrame implements ActionListener, MouseListener, KeyLis
 		} else if (gameState.equals("Old")) { // if placing tokens, sets up
 												// buttons
 
-			JButton player1Button = new JButton(colour1), player2Button = new JButton(colour2),
-					check = new JButton("Check/Begin Game");
-			JButton save = new JButton("Save"), load = new JButton("Load");
-			;
+			JButton player1Button = new JButton(colour1), player2Button = new JButton(colour2), check = new JButton("Check/Begin Game");
+			JButton save = new JButton("Save"), load = new JButton("Load");//creates the perminate save and load buttons
 			player1Button.setActionCommand("player1");
 			player2Button.setActionCommand("player2");
 			check.setActionCommand("check");
@@ -178,21 +176,21 @@ public class GUI extends JFrame implements ActionListener, MouseListener, KeyLis
 
 	private void open_Save_Menu() {
 		// Buttons
-		JButton save1 = new JButton("Game 1");
+		JButton save1 = new JButton("Game 1"); //this adds the three buttons for game saving
 		JButton save2 = new JButton("Game 2");
 		JButton save3 = new JButton("Game 3");
-		JButton temp = new JButton("temp");
+		JButton temp = new JButton("temp");	//this is added for button sizing issues
 
 		save1.setActionCommand("s1");
 		save2.setActionCommand("s2");
 		save3.setActionCommand("s3");
-		save1.setBounds(100, 0, 100, 25);
+		save1.setBounds(100, 0, 100, 25);	//these buttons are placed at the bottom part of the page
 		save2.setBounds(200, 0, 100, 25);
 		save3.setBounds(300, 0, 100, 25);
 		save1.setLayout(null);
 		save2.setLayout(null);
 		save3.setLayout(null);
-		save1.add(footer);
+		save1.add(footer);	//the buttons are added at the footer of the window
 		save2.add(footer);
 		save3.add(footer);
 		temp.add(footer);
@@ -200,8 +198,8 @@ public class GUI extends JFrame implements ActionListener, MouseListener, KeyLis
 		footer.add(save2);
 		footer.add(save3);
 		footer.add(temp);
-		temp.setVisible(false);
-		setVisible(true);
+		temp.setVisible(false);//sets the button to invinsible
+		footer.setVisible(true);//displays the savebuttons
 	}
 
 	public void actionPerformed(ActionEvent e) { // if buttons are pressed
@@ -222,11 +220,11 @@ public class GUI extends JFrame implements ActionListener, MouseListener, KeyLis
 			turnNumber = 1;
 			updateTurn();
 
-		} else if (e.getActionCommand().equals("savegame")) {
-			open_Save_Menu();
-			if (e.getActionCommand().equals("s1")) {
+		} else if (e.getActionCommand().equals("savegame")) {//save is pressed
+			open_Save_Menu();//show buttons
+			if (e.getActionCommand().equals("s1")) {//save game one is pressed
 				saveGame("game1");
-				setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+				setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);//
 			}
 			if (e.getActionCommand().equals("s2")) {
 				saveGame("game2");
@@ -236,7 +234,8 @@ public class GUI extends JFrame implements ActionListener, MouseListener, KeyLis
 				saveGame("game3");
 				setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 			}
-		} else if (e.getActionCommand().equals("loadgame")) {
+		} else if (e.getActionCommand().equals("loadgame")) {//load is pressed
+			//same as above but with load
 			open_Save_Menu();
 			if (e.getActionCommand().equals("s1")) {
 				loadGame("game1");
