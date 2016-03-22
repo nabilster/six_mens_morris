@@ -3,6 +3,9 @@
     <output-path>$PROJECT_DIR$/out/artifacts/six_mens_morris_jar</output-path>
     <root id="archive" name="six_mens_morris.jar">
       <element id="module-output" name="six_mens_morris" />
+      <element id="directory" name="boards">
+        <element id="dir-copy" path="$PROJECT_DIR$/boards" />
+      </element>
     </root>
   </artifact>
 </component>
