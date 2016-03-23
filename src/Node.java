@@ -201,8 +201,8 @@ public class Node {
         else return ((node.getTokencolour()==this.getTokencolour())?node.getNumberTokens():0)+verticalCount(node.getDown());
     }
 
-    public void removeTopToken(){  // remove top token
-        tokens.remove(tokens.size()-1);
+    public Token removeTopToken(){  // remove top token
+        return tokens.pop();
     }
   
 	
@@ -210,6 +210,10 @@ public class Node {
     public void moveToken (Node to){  // move token from one node to another
         to.addToken(getTopToken());
         removeTopToken();
+    }
+
+    public void removeAllTokens (){
+        tokens.clear();
     }
 
 }

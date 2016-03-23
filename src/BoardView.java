@@ -24,7 +24,7 @@ public class BoardView extends JPanel {
      */
     public BoardView (){ //loads board
         try {
-            image = ImageIO.read(new File("board.png"));
+            image = ImageIO.read(new File("boards"+File.separator+"board.png"));
         }catch (IOException e){
             add (new JLabel("Board could not be loaded"));
         }
@@ -148,6 +148,12 @@ public class BoardView extends JPanel {
         }
         repaint();
     }
+
+    public void reset(){
+        highlight[0]=nullVal;
+        tokens.clear();
+    }
+
 
 
 }

@@ -59,4 +59,6 @@ public class Player {
         return numTokens;
     }
 
+    public void setNumTokens (int num){numTokens=num;}
+
 }
