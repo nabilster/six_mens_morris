@@ -26,4 +26,9 @@ public class PlayerView extends JPanel{
         repaint();
     }
 
+    public void setNumTokens (int num){
+        numTokens=num;
+        repaint();
+    }
+
 }

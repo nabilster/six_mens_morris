@@ -2,19 +2,14 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
-import java.util.ArrayList;
-import java.util.Random;
-import java.util.Scanner;
+import java.util.*;
 
 public class GUI extends JFrame implements ActionListener, MouseListener, KeyListener {
 
     private BoardView board = new BoardView(); // view for board
     private String colour1 = "red", colour2 = "blue"; // colour names
-    private int colour1Code = 16711680, colour2Code = 255; // hexcodes for
-    // colours
-    private JLabel turnIndicator = new JLabel("", JLabel.CENTER); // label for
-    // whose
-    // turn
+    private int colour1Code = 16711680, colour2Code = 255; // hexcodes for colours
+    private JLabel turnIndicator = new JLabel("", JLabel.CENTER); // label for whose turn
     private JPanel footer = new JPanel(); // footer panel
     private int turnNumber; // keeps track of whose turn it is
     private String gameState = ""; // game state
@@ -23,16 +18,14 @@ public class GUI extends JFrame implements ActionListener, MouseListener, KeyLis
     private PlayerView[] playerViews = new PlayerView[2]; // player view
     private Node[] nodes = new Node[16];
     private int selectedNumber;
-    private int previousnode;
+    private int previousNode;
     private int blueTokens = 0;
     private int redTokens = 0;
-    private int errorcatch = 1;
     private int Contra = 0;
     private JButton saveGame, loadGame, save1, save2,save3;
 
     public GUI() {
         initializeNodes();
-
         // initializes stuff, adds listeners, sets first player
         header.setLayout(new FlowLayout());
         JButton newGame = new JButton("New Game");
@@ -52,14 +45,12 @@ public class GUI extends JFrame implements ActionListener, MouseListener, KeyLis
         Random rng = new Random();
         turnNumber = rng.nextInt(2);
         updateTurn();
-
         // sets up some panel spacing and layout
         left.setLayout(new BoxLayout(left, BoxLayout.PAGE_AXIS));
         right.setLayout(new BoxLayout(right, BoxLayout.PAGE_AXIS));
         left.add(Box.createRigidArea(new Dimension(100, 0)));
         right.add(Box.createRigidArea(new Dimension(100, 0)));
         footer.add(Box.createRigidArea(new Dimension(0, 50)));
-
         // adds panels
         setTitle("Six Men's Morris");
         board.addMouseListener(this);
@@ -189,13 +180,16 @@ public class GUI extends JFrame implements ActionListener, MouseListener, KeyLis
         String cmd = e.getActionCommand();
         if (cmd.equals("NewG")||(gameState.equals("")&&cmd.equals("loadgame"))) {
             // updates which mode to start
-            gameState = (cmd.equals("NewG")) ? "New" : "Old";
+            gameState = "New";
             header.removeAll();
             revalidate();
             header.add(turnIndicator, BorderLayout.NORTH);
             header.revalidate();
             initExtraPanels();
-            if (cmd.equals("loadgame")){open_Save_Menu("load");}
+            if (cmd.equals("loadgame")){
+                open_Save_Menu("load");
+                turnIndicator.setText("");
+            }
             revalidate();
         } else if (cmd.equals("savegame")) {//save is pressed
             open_Save_Menu("save");//show buttons
@@ -205,16 +199,7 @@ public class GUI extends JFrame implements ActionListener, MouseListener, KeyLis
         } else if (cmd.equals("loadgame")) {//load is pressed same as above but with load
             open_Save_Menu("load");
         }else if (cmd.equals("l1")||cmd.equals("l2")||cmd.equals("l3")) {
-            String file="";
-            switch (cmd){
-                case "l1": file="s1";
-                    break;
-                case "l2": file="s2";
-                    break;
-                case "l3": file="s3";
-                    break;
-            }
-            loadGame(file);
+            loadGame("s"+cmd.charAt(1),false);
             closeSaveMenu();
         }
     }
@@ -243,24 +228,14 @@ public class GUI extends JFrame implements ActionListener, MouseListener, KeyLis
         int y = e.getY();
         int nodeNumber = findNodeNumber(x, y);
 
-        if (e.getButton() == 1 && !gameState.equals("") && nodeNumber != -1) { // if
-            // the
-            // correct
-            // mouse
-            // button
-            // is
-            // pressed
-            // and
-            // pieces
-            // are
+        if (e.getButton() == 1 && !gameState.equals("") && nodeNumber != -1) { // if the correct mouse button is pressed and pieces are
 
             //System.out.println("Board Width: " + board.getWidth() + " x: " + x + "\tBoard Height: " + board.getHeight()
             //        + " y: " + y + "" + "   \tTurn Number: " + turnNumber + "\tGame State: " + gameState + "\tBlue: "
             //        + blueTokens + "\tRed: " + redTokens);
-
             if (gameState.equals("New")) {
                 // being placed
-                placePiece(turnNumber % 2, nodeNumber); // piece placed
+                boolean piecePlaced = placePiece(turnNumber % 2, nodeNumber); // piece placed
 
                 if (players[0].getNumTokens() == 0 && players[1].getNumTokens() == 0) {
                     gameState = "Move";// checks if all pieces placed
@@ -271,26 +246,22 @@ public class GUI extends JFrame implements ActionListener, MouseListener, KeyLis
                             blueTokens++;
                     }
                 }
-
-                if (nodes[nodeNumber].inMill() && errorcatch != 1) {
-                    previousnode = nodeNumber;
+                if (nodes[nodeNumber].inMill()&&piecePlaced) {
+                    previousNode = nodeNumber;
                     gameState = "MillMade";
                     showRemove();
-                } else {
+                } else if (piecePlaced) {
                     updateTurn();
                 }
-                errorcatch = 0; // used to catch error if place pieced so you
-                // dont end up removing 2 pieces
 
-            } else if (gameState.equals("Move")) { // highlights piece to be
-                // moved
+            } else if (gameState.equals("Move")) { // highlights piece to be moved
 
-                if (nolegalmoves(colour1Code)) {
+                if (noLegalMoves(colour1Code)) {
                     JOptionPane.showMessageDialog(null, "Blue Wins by default", "Six Men's Morris",
                             JOptionPane.INFORMATION_MESSAGE);
                     System.exit(0);
                 }
-                if (nolegalmoves(colour2Code)) {
+                if (noLegalMoves(colour2Code)) {
                     JOptionPane.showMessageDialog(null, "Red Wins by default", "Six Men's Morris",
                             JOptionPane.INFORMATION_MESSAGE);
                     System.exit(0);
@@ -302,47 +273,24 @@ public class GUI extends JFrame implements ActionListener, MouseListener, KeyLis
                     gameState = "Place";
                 }
 
-            } else if (gameState.equals("Place")) { // allows moving of
-                // highlighted piece to
-                // another place and updates
-                // the turn so other player
-                // can move
-                if (nodes[selectedNumber].isConnectedTo(nodeNumber) && nodes[nodeNumber].getNumberTokens() == 0) { // if
-                    // node
-                    // is
-                    // connected
-                    // and
-                    // node
-                    // want
-                    // to
-                    // move
-                    // to
-                    // has
-                    // no
-                    // token
+            } else if (gameState.equals("Place")) { // allows moving of highlighted piece to another place and updates
+                // the turn so other player can move
+                if (nodes[selectedNumber].isConnectedTo(nodeNumber) && nodes[nodeNumber].getNumberTokens() == 0) {
+                // if node is connected and node want to move to has no token
                     nodes[selectedNumber].moveToken(nodes[nodeNumber]);
                     board.moveToken(nodes[selectedNumber], nodes[nodeNumber]);
 
-                    // determines after placing token at new location there is a
-                    // mill
+                    // determines after placing token at new location there is a mill
                     if (nodes[nodeNumber].inMill()) {
-                        previousnode = nodeNumber;
+                        previousNode = nodeNumber;
                         gameState = "MillMade";
                         showRemove();
                     } else {
                         gameState = "Move";
                         updateTurn();
                     }
-                } else if (nodes[selectedNumber] == nodes[nodeNumber]) { // removes
-                    // highlighted
-                    // node,
-                    // allows
-                    // to
-                    // click
-                    // and
-                    // move
-                    // another
-                    // piece
+                } else if (nodes[selectedNumber] == nodes[nodeNumber]) {
+                // removes highlighted node, allows to click and move another piece
                     selectedNumber = -1;
                     board.clearHighlight();
                     gameState = "Move";
@@ -370,7 +318,7 @@ public class GUI extends JFrame implements ActionListener, MouseListener, KeyLis
         revalidate();
     }
 
-    private boolean nolegalmoves(int colour) {
+    private boolean noLegalMoves(int colour) {
         int tokenswithcolour = 0;
         int cantmove = 0;
 
@@ -417,7 +365,7 @@ public class GUI extends JFrame implements ActionListener, MouseListener, KeyLis
             return !(turnNumber % 2 == 1 && nodes[nodeNumber].getTokencolour() == colour1Code);
     }
 
-    private void placePiece(int pNum, int NN) {
+    private boolean placePiece(int pNum, int NN) {
         int colour = (pNum == 0) ? colour1Code : colour2Code;
         if (players[pNum].removeToken() && nodes[NN].getNumberTokens() == 0) {
             nodes[NN].addToken(colour);
@@ -426,35 +374,32 @@ public class GUI extends JFrame implements ActionListener, MouseListener, KeyLis
         } else {
             players[pNum].addToken();
             if (nodes[NN].getNumberTokens() > 0) {
-                errorcatch = 1;
                 JOptionPane.showMessageDialog(null, "Piece is already placed at selected node", "Six Men's Morris",
                         JOptionPane.INFORMATION_MESSAGE);
+                return false;
             }
         }
+        return true;
     }
 
     private void removePiece(int NN) { // get rid of pNum later
 
         if (nodes[NN].getNumberTokens() != 0) {
-            int millcolour = nodes[previousnode].getTokencolour();
-            int chosencolour = nodes[NN].getTokencolour();
+            int millColour = nodes[previousNode].getTokencolour();
+            int chosenColour = nodes[NN].getTokencolour();
 
-            //System.out.println("Colour: " + (millcolour != chosencolour) + " !inMill:" + (!nodes[NN].inMill()) + " "
+            //System.out.println("Colour: " + (millColour != chosencolour) + " !inMill:" + (!nodes[NN].inMill()) + " "
               //      + "onlyMills:" + onlyMills(chosencolour) + " number:" + (numbColourToken(chosencolour) <= 3));
 
-            if (millcolour != chosencolour
-                    && ((!nodes[NN].inMill() || onlyMills(chosencolour)) || numbColourToken(chosencolour) <= 3)) {
+            if (millColour != chosenColour
+                    && ((!nodes[NN].inMill() || onlyMills(chosenColour)) || numbColourToken(chosenColour) <= 3)) {
 
                 board.removeToken(nodes[NN].getRelX(), nodes[NN].getRelY());
                 nodes[NN].removeTopToken();
 
-                if (chosencolour == colour1Code && redTokens != 0) { // if
-                    // chosencolour
-                    // red
+                if (chosenColour == colour1Code && redTokens != 0) { // if chosencolour red
                     redTokens--;
-                } else if (chosencolour == colour2Code && redTokens != 0) {// if
-                    // chosencolour
-                    // blue
+                } else if (chosenColour == colour2Code && redTokens != 0) {// if chosencolour blue
                     blueTokens--;
                 }
 
@@ -497,14 +442,23 @@ public class GUI extends JFrame implements ActionListener, MouseListener, KeyLis
     }
 
     private void saveGame(String filename) {
+        Stack <Token> tokens;
         try {
             PrintWriter fout = new PrintWriter(new File(filename + ".sav"));
             fout.println(turnNumber % 2);
             fout.println(gameState);
+            fout.println(previousNode);
+            fout.println(players[0].getNumTokens());
+            fout.println(players[1].getNumTokens());
+            fout.println(blueTokens);
+            fout.println(redTokens);
             for (Node node : nodes) {
+                tokens = new Stack<>();
                 while (node.getNumberTokens() > 0) {
                     fout.println(node.getNodeNumber() + "," + node.getTokencolour());
-                    node.removeTopToken();
+                    tokens.push(node.removeTopToken());
+                }while(!tokens.empty()){
+                    node.addToken(tokens.pop());
                 }
             }
             fout.close();
@@ -513,53 +467,81 @@ public class GUI extends JFrame implements ActionListener, MouseListener, KeyLis
         }
     }
 
-    private void loadGame(String filename) {
-        String[] line = new String[2];
-        int nodeNumber;
-        try {
-            Scanner fin = new Scanner(new File(filename + ".sav"));
-            if (fin.hasNextLine()) {
-                line[0] = fin.nextLine();
-                turnNumber = Integer.parseInt(line[0]);
-            } else {
-                System.out.println("turn");
-                throw new IllegalStateException("STOP TAMPERING");
+    private void loadGame (String filename, boolean restore){
+        saveGame("backup");
+        String [] line;
+        int tempInt;
+        String result="";
+        try{
+            Scanner fin=new Scanner(new File(filename+".sav"));
+            turnNumber=Integer.parseInt(fin.nextLine());
+            gameState=fin.nextLine();
+            previousNode=Integer.parseInt(fin.nextLine());
+            for (int i = 0; i<2; i++) {
+                tempInt = Integer.parseInt(fin.nextLine());
+                players[i].setNumTokens(tempInt);
+                playerViews[i].setNumTokens(tempInt);
             }
-            if (fin.hasNextLine()) {
-                gameState = fin.nextLine();
-            } else {
-                System.out.println("State");
-                throw new IllegalStateException("STOP TAMPERING");
+            blueTokens=Integer.parseInt(fin.nextLine());
+            redTokens=Integer.parseInt(fin.nextLine());
+            for (Node node : nodes) {
+                node.removeAllTokens();
             }
-            while (fin.hasNextLine()) {
+            board.reset();
+            while (fin.hasNextLine()){
                 line = fin.nextLine().split(",");
-                nodeNumber = Integer.parseInt(line[0]);
-                nodes[nodeNumber].addToken(Integer.parseInt(line[1].trim()));
+                tempInt=Integer.parseInt(line[0]);
+                nodes[tempInt].addToken(Integer.parseInt(line[1]));
+                board.placeToken(nodes[tempInt]);
             }
-            if (!gameState.equals("New")) {
-                for (int i = 0; i < nodes.length - 1; i++) {
-                    if (nodes[i].getNumberTokens() > 0 && nodes[i].getTokencolour() == colour1Code) {
-                        redTokens++;
-                    } else if (nodes[i].getNumberTokens() > 0 && nodes[i].getTokencolour() == colour2Code)
-                        blueTokens++;
+            turnNumber--;
+            updateTurn();
+            fin.close();
+            board.repaint();
+            board.updateUI();
+            board.revalidate();
+            playerViews[0].repaint();
+            playerViews[0].revalidate();
+            playerViews[1].repaint();
+            playerViews[1].revalidate();
+            revalidate();
+            result="good";
+        } catch (FileNotFoundException e) {
+            result = "no file";
+            if (redTokens==0&&blueTokens==0)gameState="New";
+            header.add(turnIndicator, BorderLayout.NORTH);
+            header.revalidate();
+            revalidate();
+            turnNumber--;
+            updateTurn();
+        } catch (NumberFormatException e){
+            e.printStackTrace();
+            result="NaN error";
+        } catch (NoSuchElementException e){
+            e.printStackTrace();
+            result="state error";
+        } catch (NullPointerException e) {
+            e.printStackTrace();
+            result = "node error";
+        }catch (Exception e){
+            e.printStackTrace();
+            result="Unknown Exception";
+        }finally {
+            if (result.equals("good")){
+                JOptionPane.showMessageDialog(null, "Game Loaded!", "Six Men's Morris",JOptionPane.INFORMATION_MESSAGE);
+            }else{
+                if (result.equals("no file")){
+                    JOptionPane.showMessageDialog(null, "Save File is Empty!", "Six Men's Morris",JOptionPane.INFORMATION_MESSAGE);
+                }else {
+                    JOptionPane.showMessageDialog(null, result, "Load Game Error", JOptionPane.ERROR_MESSAGE);
+                }
+                if (restore) {
+                    loadGame("backup", true);
+                    JOptionPane.showMessageDialog(null, result, "Could not restore game state.  Please restart the" +
+                            " application.", JOptionPane.ERROR_MESSAGE);
                 }
             }
-        } catch (FileNotFoundException e) {
-            System.out.println("Error reading from file!");
-        } catch (NumberFormatException e) {
-            System.out.println("Save file corrupted.  Cannot load fle.  (Error code: 314159265)");
-        } catch (IllegalStateException e) {
-            System.out.println("Save file corrupted.  Cannot load file.  (Error code: 11235813)");
-        } catch (IndexOutOfBoundsException e) {
-            System.out.println("Save file not compatible with game set-up (board.smm has been modified).");
-        } catch (Exception e) {
-            System.out.print("Program has encountered an unknown error: ");
-            System.out.println(e);
         }
-        board.updateUI();
-        board.repaint();
-        board.revalidate();
-        revalidate();
     }
 
     private boolean onlyMills(int colour) {
@@ -586,7 +568,6 @@ public class GUI extends JFrame implements ActionListener, MouseListener, KeyLis
         gui.setSize(defaultSize);
         gui.setMinimumSize(defaultSize);
         gui.setVisible(true);
-
     }
 
     @Override

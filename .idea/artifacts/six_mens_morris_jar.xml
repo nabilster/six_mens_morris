@@ -6,6 +6,11 @@
       <element id="directory" name="boards">
         <element id="dir-copy" path="$PROJECT_DIR$/boards" />
       </element>
+      <element id="file-copy" path="$PROJECT_DIR$/s1.sav" />
+      <element id="file-copy" path="$PROJECT_DIR$/s2.sav" />
+      <element id="file-copy" path="$PROJECT_DIR$/s3.sav" />
+      <element id="file-copy" path="$PROJECT_DIR$/board.smm" />
+      <element id="file-copy" path="$PROJECT_DIR$/backup.sav" />
     </root>
   </artifact>
 </component>

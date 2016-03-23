@@ -99,6 +99,11 @@ public class BoardView extends JPanel {
         repaint();
     }
 
+    public void reset(){
+        highlight[0]=nullVal;
+        tokens.clear();
+    }
+
 
 
 }
