@@ -4,25 +4,36 @@ import java.awt.event.*;
 import java.io.*;
 import java.util.*;
 
+//TODO FIX LOAD
 public class GUI extends JFrame implements ActionListener, MouseListener, KeyListener {
 
-    private BoardView board = new BoardView(); // view for board
-    private String colour1 = "red", colour2 = "blue"; // colour names
     private int colour1Code = 16711680, colour2Code = 255; // hexcodes for colours
-    private JLabel turnIndicator = new JLabel("", JLabel.CENTER); // label for whose turn
-    private JPanel footer = new JPanel(); // footer panel
     private int turnNumber; // keeps track of whose turn it is
-    private String gameState = ""; // game state
-    private JPanel header = new JPanel(), left = new JPanel(), right = new JPanel(); // Panels
-    private Player[] players = new Player[2]; // player model
-    private PlayerView[] playerViews = new PlayerView[2]; // player view
-    private Node[] nodes = new Node[16];
     private int selectedNumber;
     private int previousNode;
     private int blueTokens = 0;
     private int redTokens = 0;
     private int Contra = 0;
+    private String colour1 = "red", colour2 = "blue"; // colour names
+    private PlayerView[] playerViews = new PlayerView[2]; // player view
+    private Player[] players = new Player[2]; // player model
+    private Node[] nodes = new Node[16];
+    private BoardView board = new BoardView(); // view for board
+    private JPanel footer = new JPanel(); // footer panel
+    private JPanel header = new JPanel(), left = new JPanel(), right = new JPanel(); // Panels
+    private JLabel turnIndicator = new JLabel("", JLabel.CENTER); // label for whose turn
     private JButton saveGame, loadGame, save1, save2,save3;
+    private GameStates gameState = GameStates.NONE; // game state
+
+    private Random rng = new Random();
+
+    private enum GameStates{
+        NONE("NONE"), START("START"), MOVE("MOVE"), PLACE("PLACE"), MILLMADE("MILLMADE");
+        private String state;
+        GameStates (String state){this.state=state;}
+        public String toString (){return state;}
+    }
+
 
     public GUI() {
         initializeNodes();
@@ -42,7 +53,6 @@ public class GUI extends JFrame implements ActionListener, MouseListener, KeyLis
         save3.addActionListener(this);
         header.add(newGame);
         header.add(loadGame);
-        Random rng = new Random();
         turnNumber = rng.nextInt(2);
         updateTurn();
         // sets up some panel spacing and layout
@@ -178,9 +188,9 @@ public class GUI extends JFrame implements ActionListener, MouseListener, KeyLis
 
     public void actionPerformed(ActionEvent e) { // if buttons are pressed
         String cmd = e.getActionCommand();
-        if (cmd.equals("NewG")||(gameState.equals("")&&cmd.equals("loadgame"))) {
+        if (cmd.equals("NewG")||(gameState.equals(GameStates.NONE)&&cmd.equals("loadgame"))) {
             // updates which mode to start
-            gameState = "New";
+            gameState = GameStates.START;
             header.removeAll();
             revalidate();
             header.add(turnIndicator, BorderLayout.NORTH);
@@ -228,17 +238,17 @@ public class GUI extends JFrame implements ActionListener, MouseListener, KeyLis
         int y = e.getY();
         int nodeNumber = findNodeNumber(x, y);
 
-        if (e.getButton() == 1 && !gameState.equals("") && nodeNumber != -1) { // if the correct mouse button is pressed and pieces are
+        if (e.getButton() == 1 && !gameState.equals(GameStates.NONE) && nodeNumber != -1) { // if the correct mouse button is pressed and pieces are
 
             //System.out.println("Board Width: " + board.getWidth() + " x: " + x + "\tBoard Height: " + board.getHeight()
             //        + " y: " + y + "" + "   \tTurn Number: " + turnNumber + "\tGame State: " + gameState + "\tBlue: "
             //        + blueTokens + "\tRed: " + redTokens);
-            if (gameState.equals("New")) {
+            if (gameState.equals(GameStates.START)) {
                 // being placed
                 boolean piecePlaced = placePiece(turnNumber % 2, nodeNumber); // piece placed
 
                 if (players[0].getNumTokens() == 0 && players[1].getNumTokens() == 0) {
-                    gameState = "Move";// checks if all pieces placed
+                    gameState = GameStates.MOVE;// checks if all pieces placed
                     for (int i = 0; i < nodes.length - 1; i++) {
                         if (nodes[i].getNumberTokens() > 0 && nodes[i].getTokencolour() == colour1Code) {
                             redTokens++;
@@ -248,13 +258,13 @@ public class GUI extends JFrame implements ActionListener, MouseListener, KeyLis
                 }
                 if (nodes[nodeNumber].inMill()&&piecePlaced) {
                     previousNode = nodeNumber;
-                    gameState = "MillMade";
+                    gameState = GameStates.MILLMADE;
                     showRemove();
                 } else if (piecePlaced) {
                     updateTurn();
                 }
 
-            } else if (gameState.equals("Move")) { // highlights piece to be moved
+            } else if (gameState.equals(GameStates.MOVE)) { // highlights piece to be moved
 
                 if (noLegalMoves(colour1Code)) {
                     JOptionPane.showMessageDialog(null, "Blue Wins by default", "Six Men's Morris",
@@ -270,10 +280,10 @@ public class GUI extends JFrame implements ActionListener, MouseListener, KeyLis
                 if (canSelect(nodeNumber)) {
                     selectedNumber = nodeNumber;
                     board.highlightNode(nodes[nodeNumber]);
-                    gameState = "Place";
+                    gameState = GameStates.PLACE;
                 }
 
-            } else if (gameState.equals("Place")) { // allows moving of highlighted piece to another place and updates
+            } else if (gameState.equals(GameStates.PLACE)) { // allows moving of highlighted piece to another place and updates
                 // the turn so other player can move
                 if (nodes[selectedNumber].isConnectedTo(nodeNumber) && nodes[nodeNumber].getNumberTokens() == 0) {
                 // if node is connected and node want to move to has no token
@@ -283,22 +293,22 @@ public class GUI extends JFrame implements ActionListener, MouseListener, KeyLis
                     // determines after placing token at new location there is a mill
                     if (nodes[nodeNumber].inMill()) {
                         previousNode = nodeNumber;
-                        gameState = "MillMade";
+                        gameState = GameStates.MILLMADE;
                         showRemove();
                     } else {
-                        gameState = "Move";
+                        gameState = GameStates.MOVE;
                         updateTurn();
                     }
                 } else if (nodes[selectedNumber] == nodes[nodeNumber]) {
                 // removes highlighted node, allows to click and move another piece
                     selectedNumber = -1;
                     board.clearHighlight();
-                    gameState = "Move";
+                    gameState = GameStates.MOVE;
                 } else {
                     JOptionPane.showMessageDialog(null, "Cannot move piece to selected node", "Six Men's Morris",
                             JOptionPane.INFORMATION_MESSAGE);
                 }
-            } else if (gameState.equals("MillMade")) {
+            } else if (gameState.equals(GameStates.MILLMADE)) {
                 removePiece(nodeNumber);
 
             }
@@ -413,9 +423,9 @@ public class GUI extends JFrame implements ActionListener, MouseListener, KeyLis
                     System.exit(0);
                 }
                 if (blueTokens == 0 || redTokens == 0) {
-                    gameState = "New";
+                    gameState = GameStates.START;
                 } else {
-                    gameState = "Move";
+                    gameState = GameStates.MOVE;
                 }
                 updateTurn();
             } else {
@@ -430,8 +440,7 @@ public class GUI extends JFrame implements ActionListener, MouseListener, KeyLis
 
     }
 
-    private int findNodeNumber(int x, int y) { // finds the node number where u
-        // have selected
+    private int findNodeNumber(int x, int y) { // finds the node number where u have selected
         int nodeNumber = -1;
         double relX = (x - (board.getWidth() / 2.0)) / board.getDimension();
         for (int i = 0; i < nodes.length; i++) {
@@ -446,7 +455,7 @@ public class GUI extends JFrame implements ActionListener, MouseListener, KeyLis
         try {
             PrintWriter fout = new PrintWriter(new File(filename + ".sav"));
             fout.println(turnNumber % 2);
-            fout.println(gameState);
+            fout.println(gameState.toString());
             fout.println(previousNode);
             fout.println(players[0].getNumTokens());
             fout.println(players[1].getNumTokens());
@@ -472,10 +481,24 @@ public class GUI extends JFrame implements ActionListener, MouseListener, KeyLis
         String [] line;
         int tempInt;
         String result="";
+        String oldGameState;
         try{
             Scanner fin=new Scanner(new File(filename+".sav"));
             turnNumber=Integer.parseInt(fin.nextLine());
-            gameState=fin.nextLine();
+            oldGameState=fin.nextLine();
+            switch (oldGameState){
+                case "NONE": gameState=GameStates.NONE;
+                    break;
+                case "START": gameState=GameStates.START;
+                    break;
+                case "MOVE": gameState=GameStates.MOVE;
+                    break;
+                case "Place": gameState=GameStates.PLACE;
+                    break;
+                case "MILLMADE": gameState=GameStates.MILLMADE;
+                    break;
+                default: System.out.print("ERROR");
+            }
             previousNode=Integer.parseInt(fin.nextLine());
             for (int i = 0; i<2; i++) {
                 tempInt = Integer.parseInt(fin.nextLine());
@@ -508,7 +531,7 @@ public class GUI extends JFrame implements ActionListener, MouseListener, KeyLis
             result="good";
         } catch (FileNotFoundException e) {
             result = "no file";
-            if (redTokens==0&&blueTokens==0)gameState="New";
+            if (redTokens==0&&blueTokens==0)gameState=GameStates.START;
             header.add(turnIndicator, BorderLayout.NORTH);
             header.revalidate();
             revalidate();
@@ -554,6 +577,53 @@ public class GUI extends JFrame implements ActionListener, MouseListener, KeyLis
         }
         return (numMills == 2);
     }
+
+    private void AI (){
+        int nodeOfInterest;
+        if (gameState.equals(GameStates.START)){
+            do {
+                nodeOfInterest=rng.nextInt(nodes.length);
+            }while (nodes[nodeOfInterest].getNumberTokens()==0);
+            placeNewPiece(nodeOfInterest);
+        }else if (gameState.equals(GameStates.MOVE)){
+            if (noLegalMoves(colour1Code)) {
+                JOptionPane.showMessageDialog(null, "Blue Wins by default", "Six Men's Morris",
+                        JOptionPane.INFORMATION_MESSAGE);
+                System.exit(0);
+            }
+            if (noLegalMoves(colour2Code)) {
+                JOptionPane.showMessageDialog(null, "Red Wins by default", "Six Men's Morris",
+                        JOptionPane.INFORMATION_MESSAGE);
+                System.exit(0);
+            }
+            do {
+                nodeOfInterest=rng.nextInt(nodes.length);
+            }while (!nodes[nodeOfInterest].isSurrounded()&& canSelect(nodeOfInterest));
+            Integer [] possible = nodes[nodeOfInterest].getConnectedNodeNumbers();
+            do {
+                nodeOfInterest=rng.nextInt(possible.length);
+            }while (nodes[possible[nodeOfInterest]].getNumberTokens()==0);
+            moveToken (possible[nodeOfInterest]);
+        }else if (gameState.equals(GameStates.MILLMADE)){
+            do{
+                nodeOfInterest=rng.nextInt(nodes.length);
+            }while (nodes[nodeOfInterest].getNumberTokens()>0 &&
+                    nodes[previousNode].getTokencolour()!=nodes[nodeOfInterest].getTokencolour());
+            removePiece(nodeOfInterest);
+        }
+    }
+
+    /*
+     case "NONE": gameState=GameStates.NONE;
+                    break;
+                case "START": gameState=GameStates.START;
+                    break;
+                case "MOVE": gameState=GameStates.MOVE;
+                    break;
+                case "Place": gameState=GameStates.PLACE;
+                    break;
+                case "MILLMADE":
+     */
 
     public static void main(String[] args) {
         // sets the GUI look based on OS
