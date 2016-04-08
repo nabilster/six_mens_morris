@@ -227,7 +227,7 @@ public class Node {
 
     public boolean isSurrounded (){
         for (Node connection: connected){
-            if (connection!=null && connection.getNumberTokens()>0){
+            if (connection!=null && connection.getNumberTokens()==0){
                 return false;
             }
         }

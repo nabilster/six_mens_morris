@@ -149,7 +149,6 @@ public class GUI extends JFrame implements ActionListener, MouseListener, KeyLis
 
     private void updateTurn() {
         turnNumber++;
-        System.out.println(turnNumber%2);
         // sets font colour and changes JLabel's text to reflect turn
         String text = "<html><font color='";
         text += (turnNumber % 2 == 0) ? colour1 + "'>" + colour1 + "'s</font> "
@@ -217,7 +216,7 @@ public class GUI extends JFrame implements ActionListener, MouseListener, KeyLis
                 open_Save_Menu("load");
                 turnIndicator.setText("");
             }else if (cmd.equals("ai")){
-                aiTurnNumber=rng.nextInt(1);
+                aiTurnNumber=rng.nextInt(2);
                 if (aiTurnNumber==turnNumber%2){
                     AI();
                 }
@@ -358,6 +357,7 @@ public class GUI extends JFrame implements ActionListener, MouseListener, KeyLis
         turnIndicator.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 20));
         turnIndicator.revalidate();
         revalidate();
+        if (turnNumber%2==aiTurnNumber)AI();
     }
 
     private boolean noLegalMoves(int colour) {
@@ -631,18 +631,21 @@ public class GUI extends JFrame implements ActionListener, MouseListener, KeyLis
                 System.exit(0);
             }
             do {
-                nodeOfInterest=rng.nextInt(nodes.length);
-            }while (nodes[nodeOfInterest].isSurrounded()&& !canSelect(nodeOfInterest));
-            Integer [] possible = nodes[nodeOfInterest].getConnectedNodeNumbers();
+                selectedNumber=rng.nextInt(nodes.length);
+            }while (nodes[selectedNumber].isSurrounded() || !canSelect(selectedNumber));
+            Integer [] possible = nodes[selectedNumber].getConnectedNodeNumbers();
             do {
                 nodeOfInterest=rng.nextInt(possible.length);
-            }while (nodes[possible[nodeOfInterest]].getNumberTokens()!=0);
+            }while (nodes[possible[nodeOfInterest]].getNumberTokens()>0);
+
             moveToken (possible[nodeOfInterest]);
         }else if (gameState.equals(GameStates.MILLMADE)){
+            int colourCheck= (aiTurnNumber % 2 == 0) ? colour1Code : colour2Code;
             do{
                 nodeOfInterest=rng.nextInt(nodes.length);
-            }while (nodes[nodeOfInterest].getNumberTokens()==0 &&
-                    nodes[previousNode].getTokencolour()==nodes[nodeOfInterest].getTokencolour());
+            }while (nodes[nodeOfInterest].getNumberTokens()<1 ||
+                    colourCheck==nodes[nodeOfInterest].getTokencolour() ||
+                    (nodes[nodeOfInterest].inMill()&&!onlyMills(nodes[nodeOfInterest].getTokencolour())));
             removePiece(nodeOfInterest);
         }
     }
