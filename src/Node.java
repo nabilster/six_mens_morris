@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.Stack;
 
 /**
@@ -214,6 +215,23 @@ public class Node {
 
     public void removeAllTokens (){
         tokens.clear();
+    }
+
+    public Integer [] getConnectedNodeNumbers(){
+        ArrayList<Integer> numbers = new ArrayList<>();
+        for (Node aConnected : connected) {
+            if (aConnected != null) numbers.add(aConnected.getNodeNumber());
+        }
+        return numbers.toArray(new Integer[numbers.size()]);
+    }
+
+    public boolean isSurrounded (){
+        for (Node connection: connected){
+            if (connection!=null && connection.getNumberTokens()==0){
+                return false;
+            }
+        }
+        return true;
     }
 
 }
