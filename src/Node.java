@@ -226,9 +226,8 @@ public class Node {
     }
 
     public boolean isSurrounded (){
-        Integer [] check = getConnectedNodeNumbers();
-        for (Integer i: check){
-            if (connected[i].getNumberTokens()>0){
+        for (Node connection: connected){
+            if (connection!=null && connection.getNumberTokens()>0){
                 return false;
             }
         }

@@ -149,6 +149,7 @@ public class GUI extends JFrame implements ActionListener, MouseListener, KeyLis
 
     private void updateTurn() {
         turnNumber++;
+        System.out.println(turnNumber%2);
         // sets font colour and changes JLabel's text to reflect turn
         String text = "<html><font color='";
         text += (turnNumber % 2 == 0) ? colour1 + "'>" + colour1 + "'s</font> "
@@ -265,74 +266,84 @@ public class GUI extends JFrame implements ActionListener, MouseListener, KeyLis
             //        + " y: " + y + "" + "   \tTurn Number: " + turnNumber + "\tGame State: " + gameState + "\tBlue: "
             //        + blueTokens + "\tRed: " + redTokens);
             if (gameState.equals(GameStates.START)) {
-                // being placed
-                boolean piecePlaced = placePiece(turnNumber % 2, nodeNumber); // piece placed
-
-                if (players[0].getNumTokens() == 0 && players[1].getNumTokens() == 0) {
-                    gameState = GameStates.MOVE;// checks if all pieces placed
-                    for (int i = 0; i < nodes.length - 1; i++) {
-                        if (nodes[i].getNumberTokens() > 0 && nodes[i].getTokencolour() == colour1Code) {
-                            redTokens++;
-                        } else if (nodes[i].getNumberTokens() > 0 && nodes[i].getTokencolour() == colour2Code)
-                            blueTokens++;
-                    }
-                }
-                if (nodes[nodeNumber].inMill()&&piecePlaced) {
-                    previousNode = nodeNumber;
-                    gameState = GameStates.MILLMADE;
-                    showRemove();
-                } else if (piecePlaced) {
-                    updateTurn();
-                }
-
+                placeNewPiece(nodeNumber);
             } else if (gameState.equals(GameStates.MOVE)) { // highlights piece to be moved
-
-                if (noLegalMoves(colour1Code)) {
-                    JOptionPane.showMessageDialog(null, "Blue Wins by default", "Six Men's Morris",
-                            JOptionPane.INFORMATION_MESSAGE);
-                    System.exit(0);
-                }
-                if (noLegalMoves(colour2Code)) {
-                    JOptionPane.showMessageDialog(null, "Red Wins by default", "Six Men's Morris",
-                            JOptionPane.INFORMATION_MESSAGE);
-                    System.exit(0);
-                }
-
-                if (canSelect(nodeNumber)) {
-                    selectedNumber = nodeNumber;
-                    board.highlightNode(nodes[nodeNumber]);
-                    gameState = GameStates.PLACE;
-                }
-
+                selectPieceToMove(nodeNumber);
             } else if (gameState.equals(GameStates.PLACE)) { // allows moving of highlighted piece to another place and updates
-                // the turn so other player can move
-                if (nodes[selectedNumber].isConnectedTo(nodeNumber) && nodes[nodeNumber].getNumberTokens() == 0) {
-                // if node is connected and node want to move to has no token
-                    nodes[selectedNumber].moveToken(nodes[nodeNumber]);
-                    board.moveToken(nodes[selectedNumber], nodes[nodeNumber]);
-
-                    // determines after placing token at new location there is a mill
-                    if (nodes[nodeNumber].inMill()) {
-                        previousNode = nodeNumber;
-                        gameState = GameStates.MILLMADE;
-                        showRemove();
-                    } else {
-                        gameState = GameStates.MOVE;
-                        updateTurn();
-                    }
-                } else if (nodes[selectedNumber] == nodes[nodeNumber]) {
-                // removes highlighted node, allows to click and move another piece
-                    selectedNumber = -1;
-                    board.clearHighlight();
-                    gameState = GameStates.MOVE;
-                } else {
-                    JOptionPane.showMessageDialog(null, "Cannot move piece to selected node", "Six Men's Morris",
-                            JOptionPane.INFORMATION_MESSAGE);
-                }
+                moveToken(nodeNumber);
             } else if (gameState.equals(GameStates.MILLMADE)) {
                 removePiece(nodeNumber);
 
             }
+        }
+    }
+
+    private void placeNewPiece(int nodeNumber){
+        // being placed
+        boolean piecePlaced = placePiece(turnNumber % 2, nodeNumber); // piece placed
+
+        if (players[0].getNumTokens() == 0 && players[1].getNumTokens() == 0) {
+            gameState = GameStates.MOVE;// checks if all pieces placed
+            for (int i = 0; i < nodes.length - 1; i++) {
+                if (nodes[i].getNumberTokens() > 0 && nodes[i].getTokencolour() == colour1Code) {
+                    redTokens++;
+                } else if (nodes[i].getNumberTokens() > 0 && nodes[i].getTokencolour() == colour2Code)
+                    blueTokens++;
+            }
+        }
+        if (nodes[nodeNumber].inMill()&&piecePlaced) {
+            previousNode = nodeNumber;
+            gameState = GameStates.MILLMADE;
+            showRemove();
+        } else if (piecePlaced) {
+            updateTurn();
+        }
+    }
+
+    private void selectPieceToMove (int nodeNumber){
+
+        if (noLegalMoves(colour1Code)) {
+            JOptionPane.showMessageDialog(null, "Blue Wins by default", "Six Men's Morris",
+                    JOptionPane.INFORMATION_MESSAGE);
+            System.exit(0);
+        }
+        if (noLegalMoves(colour2Code)) {
+            JOptionPane.showMessageDialog(null, "Red Wins by default", "Six Men's Morris",
+                    JOptionPane.INFORMATION_MESSAGE);
+            System.exit(0);
+        }
+
+        if (canSelect(nodeNumber)) {
+            selectedNumber = nodeNumber;
+            board.highlightNode(nodes[nodeNumber]);
+            gameState = GameStates.PLACE;
+        }
+    }
+
+    private void moveToken(int nodeNumber){
+        // the turn so other player can move
+        if (nodes[selectedNumber].isConnectedTo(nodeNumber) && nodes[nodeNumber].getNumberTokens() == 0) {
+            // if node is connected and node want to move to has no token
+            nodes[selectedNumber].moveToken(nodes[nodeNumber]);
+            board.moveToken(nodes[selectedNumber], nodes[nodeNumber]);
+
+            // determines after placing token at new location there is a mill
+            if (nodes[nodeNumber].inMill()) {
+                previousNode = nodeNumber;
+                gameState = GameStates.MILLMADE;
+                showRemove();
+            } else {
+                gameState = GameStates.MOVE;
+                updateTurn();
+            }
+        } else if (nodes[selectedNumber] == nodes[nodeNumber]) {
+            // removes highlighted node, allows to click and move another piece
+            selectedNumber = -1;
+            board.clearHighlight();
+            gameState = GameStates.MOVE;
+        } else {
+            JOptionPane.showMessageDialog(null, "Cannot move piece to selected node", "Six Men's Morris",
+                    JOptionPane.INFORMATION_MESSAGE);
         }
     }
 
@@ -476,6 +487,7 @@ public class GUI extends JFrame implements ActionListener, MouseListener, KeyLis
         try {
             PrintWriter fout = new PrintWriter(new File(filename + ".sav"));
             fout.println(turnNumber % 2);
+            fout.println(aiTurnNumber);
             fout.println(gameState.toString());
             fout.println(previousNode);
             fout.println(players[0].getNumTokens());
@@ -506,6 +518,7 @@ public class GUI extends JFrame implements ActionListener, MouseListener, KeyLis
         try{
             Scanner fin=new Scanner(new File(filename+".sav"));
             turnNumber=Integer.parseInt(fin.nextLine());
+            aiTurnNumber=Integer.parseInt(fin.nextLine());
             oldGameState=fin.nextLine();
             switch (oldGameState){
                 case "NONE": gameState=GameStates.NONE;
