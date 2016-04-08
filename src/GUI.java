@@ -22,8 +22,9 @@ public class GUI extends JFrame implements ActionListener, MouseListener, KeyLis
     private JPanel footer = new JPanel(); // footer panel
     private JPanel header = new JPanel(), left = new JPanel(), right = new JPanel(); // Panels
     private JLabel turnIndicator = new JLabel("", JLabel.CENTER); // label for whose turn
-    private JButton saveGame, loadGame, save1, save2,save3;
+    private JButton saveGame, loadGame, save1, save2,save3, vsHuman, vsAI;                      //vsHuman and vsAI*
     private GameStates gameState = GameStates.NONE; // game state
+    private int aiTurnNumber = -1;   //-1 = off, 0 or 1 otherwise                               //*
 
     private Random rng = new Random();
 
@@ -44,13 +45,19 @@ public class GUI extends JFrame implements ActionListener, MouseListener, KeyLis
         save1 = new JButton("Game 1");
         save2 = new JButton("Game 2");
         save3 = new JButton("Game 3");
+        vsHuman = new JButton("VS Human");
+        vsAI = new JButton("VS Computer");
         newGame.setActionCommand("NewG");
         loadGame.setActionCommand("loadgame");
+        vsHuman.setActionCommand("human");
+        vsAI.setActionCommand("ai");
         newGame.addActionListener(this);
         loadGame.addActionListener(this);
         save1.addActionListener(this);
         save2.addActionListener(this);
         save3.addActionListener(this);
+        vsHuman.addActionListener(this);
+        vsAI.addActionListener(this);
         header.add(newGame);
         header.add(loadGame);
         turnNumber = rng.nextInt(2);
@@ -151,6 +158,9 @@ public class GUI extends JFrame implements ActionListener, MouseListener, KeyLis
         turnIndicator.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 20));
         turnIndicator.revalidate();
         revalidate();
+        if (aiTurnNumber==turnNumber%2){
+            AI();
+        }
     }
 
     private void open_Save_Menu(String lorS) {
@@ -188,7 +198,13 @@ public class GUI extends JFrame implements ActionListener, MouseListener, KeyLis
 
     public void actionPerformed(ActionEvent e) { // if buttons are pressed
         String cmd = e.getActionCommand();
-        if (cmd.equals("NewG")||(gameState.equals(GameStates.NONE)&&cmd.equals("loadgame"))) {
+        if (cmd.equals("NewG")){
+            header.removeAll();
+            revalidate();
+            header.add(vsHuman);
+            header.add(vsAI);
+            revalidate();
+        }else if (cmd.equals("human")||cmd.equals("ai")||gameState.equals(GameStates.NONE)&&cmd.equals("loadgame")) {
             // updates which mode to start
             gameState = GameStates.START;
             header.removeAll();
@@ -199,6 +215,11 @@ public class GUI extends JFrame implements ActionListener, MouseListener, KeyLis
             if (cmd.equals("loadgame")){
                 open_Save_Menu("load");
                 turnIndicator.setText("");
+            }else if (cmd.equals("ai")){
+                aiTurnNumber=rng.nextInt(1);
+                if (aiTurnNumber==turnNumber%2){
+                    AI();
+                }
             }
             revalidate();
         } else if (cmd.equals("savegame")) {//save is pressed
@@ -209,7 +230,7 @@ public class GUI extends JFrame implements ActionListener, MouseListener, KeyLis
         } else if (cmd.equals("loadgame")) {//load is pressed same as above but with load
             open_Save_Menu("load");
         }else if (cmd.equals("l1")||cmd.equals("l2")||cmd.equals("l3")) {
-            loadGame("s"+cmd.charAt(1),false);
+            loadGame("s" + cmd.charAt(1),false);
             closeSaveMenu();
         }
     }
@@ -583,7 +604,7 @@ public class GUI extends JFrame implements ActionListener, MouseListener, KeyLis
         if (gameState.equals(GameStates.START)){
             do {
                 nodeOfInterest=rng.nextInt(nodes.length);
-            }while (nodes[nodeOfInterest].getNumberTokens()==0);
+            }while (nodes[nodeOfInterest].getNumberTokens()!=0);
             placeNewPiece(nodeOfInterest);
         }else if (gameState.equals(GameStates.MOVE)){
             if (noLegalMoves(colour1Code)) {
@@ -598,32 +619,20 @@ public class GUI extends JFrame implements ActionListener, MouseListener, KeyLis
             }
             do {
                 nodeOfInterest=rng.nextInt(nodes.length);
-            }while (!nodes[nodeOfInterest].isSurrounded()&& canSelect(nodeOfInterest));
+            }while (nodes[nodeOfInterest].isSurrounded()&& !canSelect(nodeOfInterest));
             Integer [] possible = nodes[nodeOfInterest].getConnectedNodeNumbers();
             do {
                 nodeOfInterest=rng.nextInt(possible.length);
-            }while (nodes[possible[nodeOfInterest]].getNumberTokens()==0);
+            }while (nodes[possible[nodeOfInterest]].getNumberTokens()!=0);
             moveToken (possible[nodeOfInterest]);
         }else if (gameState.equals(GameStates.MILLMADE)){
             do{
                 nodeOfInterest=rng.nextInt(nodes.length);
-            }while (nodes[nodeOfInterest].getNumberTokens()>0 &&
-                    nodes[previousNode].getTokencolour()!=nodes[nodeOfInterest].getTokencolour());
+            }while (nodes[nodeOfInterest].getNumberTokens()==0 &&
+                    nodes[previousNode].getTokencolour()==nodes[nodeOfInterest].getTokencolour());
             removePiece(nodeOfInterest);
         }
     }
-
-    /*
-     case "NONE": gameState=GameStates.NONE;
-                    break;
-                case "START": gameState=GameStates.START;
-                    break;
-                case "MOVE": gameState=GameStates.MOVE;
-                    break;
-                case "Place": gameState=GameStates.PLACE;
-                    break;
-                case "MILLMADE":
-     */
 
     public static void main(String[] args) {
         // sets the GUI look based on OS
