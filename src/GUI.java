@@ -25,9 +25,9 @@ public class GUI extends JFrame implements ActionListener, MouseListener, KeyLis
     private JButton saveGame, loadGame, save1, save2,save3, vsHuman, vsAI;                      //vsHuman and vsAI*
     private GameStates gameState = GameStates.NONE; // game state
     private int aiTurnNumber = -1;   //-1 = off, 0 or 1 otherwise                               //*
-
     private Random rng = new Random();
 
+    //used as constats for what state the game is in
     private enum GameStates{
         NONE("NONE"), START("START"), MOVE("MOVE"), PLACE("PLACE"), MILLMADE("MILLMADE");
         private String state;
@@ -35,7 +35,9 @@ public class GUI extends JFrame implements ActionListener, MouseListener, KeyLis
         public String toString (){return state;}
     }
 
-
+    /**
+     * Initializes all the swing components
+     */
     public GUI() {
         initializeNodes();
         // initializes stuff, adds listeners, sets first player
@@ -81,10 +83,7 @@ public class GUI extends JFrame implements ActionListener, MouseListener, KeyLis
         getContentPane().setFocusable(true);
     }
 
-    // these are now relative to the center of the board panel due to the fact
-    // that the board image is centered with the
-    // panel, this is the easier way for tracking, although is does cause some
-    // more complicated math
+    
     private void initializeNodes() {
         Scanner fin;
         String[] tempString;
@@ -147,6 +146,7 @@ public class GUI extends JFrame implements ActionListener, MouseListener, KeyLis
         right.add(playerViews[1]);
     }
 
+    //goes to next player's turn
     private void updateTurn() {
         turnNumber++;
         // sets font colour and changes JLabel's text to reflect turn
@@ -154,15 +154,16 @@ public class GUI extends JFrame implements ActionListener, MouseListener, KeyLis
         text += (turnNumber % 2 == 0) ? colour1 + "'>" + colour1 + "'s</font> "
                 : colour2 + "'>" + colour2 + "'s</font> ";
         text += "turn.</html>";
-        turnIndicator.setText(text);
+        turnIndicator.setText(text);        //updates what the user sees
         turnIndicator.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 20));
         turnIndicator.revalidate();
         revalidate();
-        if (aiTurnNumber==turnNumber%2){
+        if (aiTurnNumber==turnNumber%2){ //will activate the AI if enabled and turned on
             AI();
         }
     }
 
+    //brings up save files
     private void open_Save_Menu(String lorS) {
         // Buttons
         footer.remove(saveGame);
@@ -184,6 +185,7 @@ public class GUI extends JFrame implements ActionListener, MouseListener, KeyLis
         revalidate();
     }
 
+    //closes save files
     private void closeSaveMenu() {
         footer.remove(save1);
         footer.remove(save2);
@@ -196,6 +198,10 @@ public class GUI extends JFrame implements ActionListener, MouseListener, KeyLis
         getContentPane();
     }
 
+    /**
+     *
+     * @param e
+     */
     public void actionPerformed(ActionEvent e) { // if buttons are pressed
         String cmd = e.getActionCommand();
         if (cmd.equals("NewG")){
@@ -253,6 +259,11 @@ public class GUI extends JFrame implements ActionListener, MouseListener, KeyLis
     public void mousePressed(MouseEvent e) {
     }
 
+    /**
+     * Activates when mouse button is released by user.
+     *
+     * @param e
+     */
     @Override
     public void mouseReleased(MouseEvent e) {
         int x = e.getX();
