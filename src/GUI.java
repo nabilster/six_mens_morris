@@ -27,7 +27,7 @@ public class GUI extends JFrame implements ActionListener, MouseListener, KeyLis
     private int aiTurnNumber = -1;   //-1 = off, 0 or 1 otherwise                               //*
     private Random rng = new Random();
 
-    //used as constats for what state the game is in
+    //used as constants for what state the game is in
     private enum GameStates{
         NONE("NONE"), START("START"), MOVE("MOVE"), PLACE("PLACE"), MILLMADE("MILLMADE");
         private String state;
@@ -83,7 +83,7 @@ public class GUI extends JFrame implements ActionListener, MouseListener, KeyLis
         getContentPane().setFocusable(true);
     }
 
-    
+    //sets up nodes on board
     private void initializeNodes() {
         Scanner fin;
         String[] tempString;
@@ -199,8 +199,9 @@ public class GUI extends JFrame implements ActionListener, MouseListener, KeyLis
     }
 
     /**
+     * does an action based on what button was pressed
      *
-     * @param e
+     * @param e info on the object interacted with by the user
      */
     public void actionPerformed(ActionEvent e) { // if buttons are pressed
         String cmd = e.getActionCommand();
@@ -260,21 +261,21 @@ public class GUI extends JFrame implements ActionListener, MouseListener, KeyLis
     }
 
     /**
-     * Activates when mouse button is released by user.
+     * Activates when mouse button is released by user.  Takes the coordinates of the mouse as input, and decides
+     * what happens next in the game based on the current state of the game.
      *
-     * @param e
+     * (@inheritDoc)
+     * @param e information on the mouse
+     *
      */
     @Override
     public void mouseReleased(MouseEvent e) {
         int x = e.getX();
         int y = e.getY();
-        int nodeNumber = findNodeNumber(x, y);
+        int nodeNumber = findNodeNumber(x, y); //gets node
 
         if (e.getButton() == 1 && !gameState.equals(GameStates.NONE) && nodeNumber != -1) { // if the correct mouse button is pressed and pieces are
 
-            //System.out.println("Board Width: " + board.getWidth() + " x: " + x + "\tBoard Height: " + board.getHeight()
-            //        + " y: " + y + "" + "   \tTurn Number: " + turnNumber + "\tGame State: " + gameState + "\tBlue: "
-            //        + blueTokens + "\tRed: " + redTokens);
             if (gameState.equals(GameStates.START)) {
                 placeNewPiece(nodeNumber);
             } else if (gameState.equals(GameStates.MOVE)) { // highlights piece to be moved
@@ -288,6 +289,7 @@ public class GUI extends JFrame implements ActionListener, MouseListener, KeyLis
         }
     }
 
+    //places new piece on board
     private void placeNewPiece(int nodeNumber){
         // being placed
         boolean piecePlaced = placePiece(turnNumber % 2, nodeNumber); // piece placed
@@ -310,6 +312,7 @@ public class GUI extends JFrame implements ActionListener, MouseListener, KeyLis
         }
     }
 
+    //selects a piece on board to be moved
     private void selectPieceToMove (int nodeNumber){
 
         if (noLegalMoves(colour1Code)) {
@@ -330,6 +333,7 @@ public class GUI extends JFrame implements ActionListener, MouseListener, KeyLis
         }
     }
 
+    //moves a selected token
     private void moveToken(int nodeNumber){
         // the turn so other player can move
         if (nodes[selectedNumber].isConnectedTo(nodeNumber) && nodes[nodeNumber].getNumberTokens() == 0) {
@@ -357,6 +361,7 @@ public class GUI extends JFrame implements ActionListener, MouseListener, KeyLis
         }
     }
 
+    //shows dialog to prompt player to remove opponent's piece
     private void showRemove() {
         String text = "<html><font color='";
         text += (turnNumber % 2 == 0) ? colour1 + "'>" + colour1 + "</font> " : colour2 + "'>" + colour2 + "</font> ";
@@ -371,6 +376,7 @@ public class GUI extends JFrame implements ActionListener, MouseListener, KeyLis
         if (turnNumber%2==aiTurnNumber)AI();
     }
 
+    //checks if there are no legal moves left
     private boolean noLegalMoves(int colour) {
         int tokenswithcolour = 0;
         int cantmove = 0;
@@ -398,6 +404,7 @@ public class GUI extends JFrame implements ActionListener, MouseListener, KeyLis
 
     }
 
+    //gets the number of tokens of each colour
     private int numbColourToken(int colour) {
         int numberOfColour = 0;
 
@@ -409,6 +416,7 @@ public class GUI extends JFrame implements ActionListener, MouseListener, KeyLis
         return numberOfColour;
     }
 
+    //checks if a piece can be selected
     private boolean canSelect(int nodeNumber) {
         if (nodes[nodeNumber].getNumberTokens() < 1)
             return false;
@@ -418,6 +426,7 @@ public class GUI extends JFrame implements ActionListener, MouseListener, KeyLis
             return !(turnNumber % 2 == 1 && nodes[nodeNumber].getTokencolour() == colour1Code);
     }
 
+    //ACTUALLY places selected piece
     private boolean placePiece(int pNum, int NN) {
         int colour = (pNum == 0) ? colour1Code : colour2Code;
         if (players[pNum].removeToken() && nodes[NN].getNumberTokens() == 0) {
@@ -435,6 +444,7 @@ public class GUI extends JFrame implements ActionListener, MouseListener, KeyLis
         return true;
     }
 
+    //removes a selected piece
     private void removePiece(int NN) { // get rid of pNum later
 
         if (nodes[NN].getNumberTokens() != 0) {
@@ -483,6 +493,7 @@ public class GUI extends JFrame implements ActionListener, MouseListener, KeyLis
 
     }
 
+    //finds node based on coordinates and the hitbox of the nodes
     private int findNodeNumber(int x, int y) { // finds the node number where u have selected
         int nodeNumber = -1;
         double relX = (x - (board.getWidth() / 2.0)) / board.getDimension();
@@ -493,6 +504,7 @@ public class GUI extends JFrame implements ActionListener, MouseListener, KeyLis
         return nodeNumber;
     }
 
+    //saves info on the game is it can be loaded
     private void saveGame(String filename) {
         Stack <Token> tokens;
         try {
@@ -520,6 +532,7 @@ public class GUI extends JFrame implements ActionListener, MouseListener, KeyLis
         }
     }
 
+    //loads old game info to continue game
     private void loadGame (String filename, boolean restore){
         saveGame("backup");
         String [] line;
@@ -612,6 +625,7 @@ public class GUI extends JFrame implements ActionListener, MouseListener, KeyLis
         }
     }
 
+    //checks if an opponent only has mills
     private boolean onlyMills(int colour) {
         int numMills = 0;
         int[] locations = {1, 4, 6, 9, 11, 14};
@@ -623,14 +637,16 @@ public class GUI extends JFrame implements ActionListener, MouseListener, KeyLis
         return (numMills == 2);
     }
 
+    //computer opponent
     private void AI (){
-        int nodeOfInterest;
+        int nodeOfInterest; //node ai is selecting
         if (gameState.equals(GameStates.START)){
             do {
                 nodeOfInterest=rng.nextInt(nodes.length);
-            }while (nodes[nodeOfInterest].getNumberTokens()!=0);
+            }while (nodes[nodeOfInterest].getNumberTokens()!=0); //randomly selects nodes to try to place a new piece on
             placeNewPiece(nodeOfInterest);
         }else if (gameState.equals(GameStates.MOVE)){
+            //checks if game is over by default
             if (noLegalMoves(colour1Code)) {
                 JOptionPane.showMessageDialog(null, "Blue Wins by default", "Six Men's Morris",
                         JOptionPane.INFORMATION_MESSAGE);
@@ -643,18 +659,17 @@ public class GUI extends JFrame implements ActionListener, MouseListener, KeyLis
             }
             do {
                 selectedNumber=rng.nextInt(nodes.length);
-            }while (nodes[selectedNumber].isSurrounded() || !canSelect(selectedNumber));
-            Integer [] possible = nodes[selectedNumber].getConnectedNodeNumbers();
+            }while (nodes[selectedNumber].isSurrounded() || !canSelect(selectedNumber)); //randomly selects a node that has a token that can be moved
+            Integer [] possible = nodes[selectedNumber].getConnectedNodeNumbers(); //list of possible positions to move the toekn to
             do {
                 nodeOfInterest=rng.nextInt(possible.length);
-            }while (nodes[possible[nodeOfInterest]].getNumberTokens()>0);
-
+            }while (nodes[possible[nodeOfInterest]].getNumberTokens()>0); //randomly selects one of the nodes it can move the piece to
             moveToken (possible[nodeOfInterest]);
         }else if (gameState.equals(GameStates.MILLMADE)){
             int colourCheck= (aiTurnNumber % 2 == 0) ? colour1Code : colour2Code;
             do{
                 nodeOfInterest=rng.nextInt(nodes.length);
-            }while (nodes[nodeOfInterest].getNumberTokens()<1 ||
+            }while (nodes[nodeOfInterest].getNumberTokens()<1 ||        //selects an opponents piece to remove
                     colourCheck==nodes[nodeOfInterest].getTokencolour() ||
                     (nodes[nodeOfInterest].inMill()&&!onlyMills(nodes[nodeOfInterest].getTokencolour())));
             removePiece(nodeOfInterest);

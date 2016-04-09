@@ -6,7 +6,7 @@
  */
 
 public class Token {
-	  int colour;
+	  private int colour;
 
     /**
      * Sets a token's colour

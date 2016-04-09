@@ -202,21 +202,38 @@ public class Node {
         else return ((node.getTokencolour()==this.getTokencolour())?node.getNumberTokens():0)+verticalCount(node.getDown());
     }
 
+    /**
+     * removes whatever token is on the top of the stack
+     *
+     * @return the token that was removed from the stack
+     */
     public Token removeTopToken(){  // remove top token
         return tokens.pop();
     }
-  
-	
 
+
+    /**
+     * transfers a token from this node to another one
+     *
+     * @param to destination node
+     */
     public void moveToken (Node to){  // move token from one node to another
         to.addToken(getTopToken());
         removeTopToken();
     }
 
+    /**
+     * removes any and all tokens on this node
+     */
     public void removeAllTokens (){
         tokens.clear();
     }
 
+    /**
+     * Gets a list of the connected nodes
+     *
+     * @return an array of the connected nodes
+     */
     public Integer [] getConnectedNodeNumbers(){
         ArrayList<Integer> numbers = new ArrayList<>();
         for (Node aConnected : connected) {
@@ -225,6 +242,11 @@ public class Node {
         return numbers.toArray(new Integer[numbers.size()]);
     }
 
+    /**
+     * Checks if there are tokens on all the nodes connected to this one
+     *
+     * @return true if the node is surrounded by tokens, false otherwises
+     */
     public boolean isSurrounded (){
         for (Node connection: connected){
             if (connection!=null && connection.getNumberTokens()==0){
