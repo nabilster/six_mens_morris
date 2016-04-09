@@ -95,7 +95,7 @@ public class BoardView extends JPanel {
      * @param node node piece was placed on
      */
     public void placeToken(Node node){ //place new token
-        double [] tokenInfo= {node.getTopToken().colour,node.getRelX(),node.getRelY()};
+        double [] tokenInfo= {node.getTopToken().getColour(),node.getRelX(),node.getRelY()};
         tokens.add(tokenInfo);
         repaint();
     }
